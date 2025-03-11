@@ -1,0 +1,135 @@
+{
+  "project_info": {
+    "project_number": "172131937774",
+    "firebase_url": "https://fynxfit-default-rtdb.firebaseio.com",
+    "project_id": "fynxfit",
+    "storage_bucket": "fynxfit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172131937774:android:af68e03689e55fa52eb2ff",
+        "android_client_info": {
+          "package_name": "com.example.fynxfitadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172131937774-0q74f16ceg2mcqprvkf6h0bbfsuqmnnh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fynxfitadmin",
+            "certificate_hash": "b5d73eb15d7a363351f04e8bd85cae3480da811e"
+          }
+        },
+        {
+          "client_id": "172131937774-qviqsf018oea6qk1jnrkjhe7mrv5a9qr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyihQzGF_EYXSdky84x2k-_4Thnw4l440"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172131937774-qviqsf018oea6qk1jnrkjhe7mrv5a9qr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "172131937774-1gdq2kkio5krof48egr01dmfmvdr42eo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fynxfitadmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172131937774:android:60b30e63f81b5f3f2eb2ff",
+        "android_client_info": {
+          "package_name": "com.example.fynxfitcoaches"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172131937774-qviqsf018oea6qk1jnrkjhe7mrv5a9qr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyihQzGF_EYXSdky84x2k-_4Thnw4l440"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172131937774-qviqsf018oea6qk1jnrkjhe7mrv5a9qr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "172131937774-1gdq2kkio5krof48egr01dmfmvdr42eo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fynxfitadmin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:172131937774:android:18828926b8b869e42eb2ff",
+        "android_client_info": {
+          "package_name": "com.example.fynxfitusers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "172131937774-pakev0f847rim3if974sktc2ra93iafm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fynxfitusers",
+            "certificate_hash": "b5d73eb15d7a363351f04e8bd85cae3480da811e"
+          }
+        },
+        {
+          "client_id": "172131937774-qviqsf018oea6qk1jnrkjhe7mrv5a9qr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyihQzGF_EYXSdky84x2k-_4Thnw4l440"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "172131937774-qviqsf018oea6qk1jnrkjhe7mrv5a9qr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "172131937774-1gdq2kkio5krof48egr01dmfmvdr42eo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fynxfitadmin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

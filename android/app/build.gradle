@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'dev.flutter.flutter-gradle-plugin'
+}
+
+android {
+    // Package namespace for Android 13+ and beyond
+    namespace 'com.example.fynxfitcoaches'
+    compileSdk flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        // jvmTarget expects a string value
+        jvmTarget = "1.8"
+    }
+
+    defaultConfig {
+        applicationId "com.example.fynxfitcoaches"
+        minSdkVersion 23
+        targetSdk flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            // NOTE: Replace with your proper release signing configuration.
+            signingConfig signingConfigs.debug
+        }
+    }
+}
+
+flutter {
+    source "../.."
+}
+
+// IMPORTANT: Apply the Google Services plugin at the bottom of the file so that it can process the dependencies correctly.
+apply plugin: 'com.google.gms.google-services'
+
