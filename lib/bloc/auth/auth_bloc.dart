@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fynxfitcoaches/bloc/auth/auth_event.dart';
 import 'package:fynxfitcoaches/bloc/auth/auth_state.dart';
@@ -19,12 +18,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
 
     try {
-      await auth.signInWithEmailAndPassword(
+    UserCredential userCredential=  await auth.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-
-      final user = auth.currentUser;
+    print(userCredential.user.runtimeType);
+      final user = userCredential.user;
+      print(user.runtimeType);
       if (user != null) {
         await _updateUserLoginTime(user);
         emit(AuthSuccess(user));
@@ -39,6 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthSuccess(authdata));
         return null;
       }else{
+      // throw e;
         emit(AuthFailure(e.toString()));
         return e.toString();
       }
