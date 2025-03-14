@@ -18,11 +18,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
 
     try {
-    UserCredential userCredential=  await auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await auth.signInWithEmailAndPassword(
         email: event.email,
         password: event.password,
       );
-    print(userCredential.user.runtimeType);
+      print(userCredential.user.runtimeType);
       final user = userCredential.user;
       print(user.runtimeType);
       if (user != null) {
@@ -33,13 +33,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
       return "Login failed. User not found.";
     } catch (e) {
-      final authdata=auth.currentUser;
-      if(authdata!=null){
+      final authdata = auth.currentUser;
+      if (authdata != null) {
         await _updateUserLoginTime(authdata);
         emit(AuthSuccess(authdata));
         return null;
-      }else{
-      // throw e;
+      } else {
+        // throw e;
         emit(AuthFailure(e.toString()));
         return e.toString();
       }
@@ -56,41 +56,44 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       User? user = userCredential.user;
-     if (user != null) {
-       print("User UID: ${user.uid}");
-       print("User Email: ${user.email}");
+      if (user != null) {
+        print("User UID: ${user.uid}");
+        print("User Email: ${user.email}");
 
-       await _firestore.collection('coaches').doc(user.uid).set({
-         'uid': user.uid,
-         'email': user.email,
-         'createdAt': FieldValue.serverTimestamp(),
-       });
+        await _firestore.collection('coaches').doc(user.uid).set({
+          'uid': user.uid,
+          'email': user.email,
+          'verified': "false",
+          'createdAt': FieldValue.serverTimestamp(),
+        });
 
-       print("User stored in Firestore successfully");
-     }
+        print("User stored in Firestore successfully");
+      }
 
-     emit(AuthSuccess(user!));
-     return null;
+      emit(AuthSuccess(user!));
+      return null;
     } catch (e) {
-      final authdata=auth.currentUser;
+      final authdata = auth.currentUser;
 
-      if(authdata!=null){
+      if (authdata != null) {
         print("User stored in Firestore successfully");
         await _firestore.collection('coaches').doc(authdata.uid).set({
           'uid': authdata.uid,
           'email': authdata.email,
           'createdAt': FieldValue.serverTimestamp(),
+          'verified': "false"
         });
-        _onLogout(LogoutEvent(), emit);
+        await auth.signOut();
 
         emit(AuthSuccess(authdata));
         return null;
-      }else{
+      } else {
         emit(AuthFailure(e.toString()));
         return e.toString();
       }
     }
   }
+
   Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
@@ -98,9 +101,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await auth.signOut();
       emit(AuthLoggedOut());
     } catch (e) {
- emit(await AuthFailure("Logout failed. Please try again."));
+      // on<Event>((event, emit) async {
+      //    await future.whenComplete(() =>  emit( AuthFailure("Logout failed. Please try again.")));
+      //     });
+      emit(AuthFailure("Logout failed. Please try again."));
     }
   }
+
   Future<void> _updateUserLoginTime(User user) async {
     try {
       await _firestore.collection('coaches').doc(user.uid).update({

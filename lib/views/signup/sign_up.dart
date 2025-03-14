@@ -6,6 +6,7 @@ import 'package:fynxfitcoaches/bloc/auth/auth_event.dart';
 import 'package:fynxfitcoaches/bloc/auth/auth_state.dart';
 import 'package:fynxfitcoaches/theme.dart';
 import 'package:fynxfitcoaches/utils/constants.dart';
+import 'package:fynxfitcoaches/views/profileonboading/profile_onboading_main.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_elevated_button.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_images.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_text.dart';
@@ -58,7 +59,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     );
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      MaterialPageRoute(builder: (context) => ProfileOnboadingMain(userId: state.user.uid)),
                     );
                   } else if (state is AuthFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
