@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fynxfitcoaches/bloc/articles/articles_event.dart';
 import 'package:fynxfitcoaches/bloc/articles/articles_state.dart';
+import 'package:fynxfitcoaches/models/article_model.dart';
 import 'package:fynxfitcoaches/utils/constants.dart';
 
 class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
@@ -12,6 +13,9 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
   ArticlesBloc() : super(ArticlesInitial()) {
     on<UploadArticlesEvent>(_uploadArticleImage);
     on<DeleteArticlesEvent>(_deleteArticleImage);
+    on<FetchCoachArticlesEvent>(_fetchCoachArticles);
+    on<UpdateArticlesEvent>(_updateArticle);// New event
+    on<DeleteCoachArticleEvent>(_onDeleteArticle);
   }
 
   Future<void> _uploadArticleImage(UploadArticlesEvent event, Emitter<ArticlesState> emit) async {
@@ -41,7 +45,7 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
       // Update document to include its ID
       await docRef.update({"documentId": docRef.id});
 
-      emit(ArticlesSuccess());
+      emit(ArticlesSuccess([]));
     } catch (e) {
 
       emit(ArticlesFailure(e.toString()));
@@ -128,5 +132,123 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
       throw e;
     }
   }
+  Future<void> _fetchCoachArticles(FetchCoachArticlesEvent event, Emitter<ArticlesState> emit) async {
+    emit(ArticlesLoading());
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        emit(ArticlesFailure("User not authenticated"));
+        return;
+      }
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection("Articles")
+          .where("userId", isEqualTo: user.uid) // Only where clause (no orderBy)
+          .get();
+
+
+      List<ArticleModel> articles = querySnapshot.docs.map((doc) {
+        return ArticleModel(
+          documentId: doc.id,
+          title: doc["title"]?.toString() ?? "Untitled",
+          subtitle: doc["subtitle"]?.toString() ?? "No description",
+          imageUrl: doc["imageUrl"]?.toString() ?? "", // Fixed extra space issue
+          createdAt: (doc["createdAt"] as Timestamp?)?.toDate() ?? DateTime.now(),
+          userId: doc["userId"]?.toString() ?? "",
+          imageId: doc["imageId"]?.toString() ?? "",
+        );
+      }).toList();
+
+      emit(ArticlesSuccess(articles));
+    } catch (e) {
+      emit(ArticlesFailure(e.toString()));
+    }
+  }
+  Future<void> _updateArticle(UpdateArticlesEvent event, Emitter<ArticlesState> emit) async {
+    emit(ArticlesLoading());
+
+    try {
+      // Get the current article data
+      DocumentSnapshot doc = await _firestore.collection("Articles").doc(event.articleId).get();
+
+      if (!doc.exists) {
+        emit(ArticlesFailure("Article not found"));
+        return;
+      }
+
+      // Extract existing image URL
+      String existingImageUrl = doc["imageUrl"] ?? "";
+      String existingImageId = doc["imageId"] ?? "";
+
+      String newImageUrl = existingImageUrl;
+      String newImageId = existingImageId;
+
+      // Check if the new image is different and upload to Cloudinary
+      if (event.imagePath != null && event.imagePath != existingImageUrl) {
+        Map<String, String> cloudinaryData = await uploadImageToCloudinary(event.imagePath!);
+        newImageUrl = cloudinaryData["secure_url"]!;
+        newImageId = cloudinaryData["public_id"]!;
+
+        // Delete old image from Cloudinary if it exists
+        if (existingImageId.isNotEmpty) {
+          await deleteImageFromCloudinary(existingImageId);
+        }
+      }
+
+      // Update Firestore document
+      await _firestore.collection("Articles").doc(event.articleId).update({
+        "title": event.articleTitle,
+        "subtitle": event.articleDescription,
+        "imageUrl": newImageUrl,
+        "imageId": newImageId,
+        "updatedAt": FieldValue.serverTimestamp(),
+      });
+
+      // Re-fetch updated articles
+      add(FetchCoachArticlesEvent());
+
+    } catch (e) {
+      emit(ArticlesFailure(e.toString()));
+    }
+  }
+  Future<void> _onDeleteArticle(
+      DeleteCoachArticleEvent event, Emitter<ArticlesState> emit) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        emit(ArticlesFailure("User not authenticated"));
+        return;
+      }
+
+      // Delete article from Firestore
+      await _firestore.collection('Articles').doc(event.articleId).delete();
+
+      // Fetch updated list of articles
+      QuerySnapshot querySnapshot = await _firestore
+          .collection("Articles")
+          .where("userId", isEqualTo: user.uid)
+          .get();
+
+      List<ArticleModel> articles = querySnapshot.docs.map((doc) {
+        return ArticleModel(
+          documentId: doc.id,
+          title: doc["title"]?.toString() ?? "Untitled",
+          subtitle: doc["subtitle"]?.toString() ?? "No description",
+          imageUrl: doc["imageUrl"]?.toString() ?? "",
+          createdAt: (doc["createdAt"] as Timestamp?)?.toDate() ?? DateTime.now(),
+          userId: doc["userId"]?.toString() ?? "",
+          imageId: doc["imageId"]?.toString() ?? "",
+        );
+      }).toList();
+
+      // Emit success state with updated articles list
+      emit(ArticlesSuccess(articles));
+    } catch (e) {
+      emit(ArticlesFailure("Failed to delete article: ${e.toString()}"));
+    }
+  }
+
+
 
 }

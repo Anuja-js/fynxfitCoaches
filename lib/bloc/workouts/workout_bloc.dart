@@ -4,14 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fynxfitcoaches/utils/constants.dart';
+import '../../models/workout_model.dart';
 import 'workout_event.dart';
 import 'workout_state.dart';
 
 class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   WorkoutBloc() : super(WorkoutInitial()) {
     on<UploadWorkoutVideoEvent>(_uploadWorkoutVideo);
+    on<FetchCoachWorkoutsEvent>((event, emit) async {
+      emit(WorkoutLoading());
+      try {
+        List<Workout> workouts = await fetchCoachWorkouts();
+        emit(WorkoutsLoaded(workouts));
+      } catch (e) {
+        emit(WorkoutFailure(e.toString()));
+      }
+    });
+    on<UpdateWorkoutEvent>(_updateWorkout);
   }
 
   Future<void> _uploadWorkoutVideo(
@@ -74,4 +86,124 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
       throw e;
     }
   }
-}
+  Future<List<Workout>> fetchCoachWorkouts() async {
+    String? coachId = getCurrentCoachId();
+    if (coachId == null) throw Exception("No logged-in coach found.");
+    print(coachId);
+    QuerySnapshot snapshot = await _firestore
+        .collection("workouts")
+        .where("userId", isEqualTo: coachId)
+        .get();
+
+    return snapshot.docs
+        .map((doc) => Workout.fromFirestore(doc))
+        .toList();
+  }
+  String? getCurrentCoachId() {
+    return _auth.currentUser?.uid;
+  }
+
+  Future<void> _updateWorkout(
+      UpdateWorkoutEvent event, Emitter<WorkoutState> emit) async {
+    emit(WorkoutLoading());
+    try {
+      String? newVideoUrl;
+      String? newImageId;
+
+      // Fetch the existing workout details
+      DocumentSnapshot docSnapshot =
+      await _firestore.collection("workouts").doc(event.workoutId).get();
+      Map<String, dynamic>? existingData =
+      docSnapshot.data() as Map<String, dynamic>?;
+
+      if (existingData == null) {
+        emit(WorkoutFailure("Workout not found"));
+        return;
+      }
+
+      // Retain existing values
+      String oldVideoUrl = existingData["videoUrl"] ?? "";
+      String oldImageId = existingData["imageId"] ?? "";
+
+      // If a new video is provided, upload it to Cloudinary
+      if (event.newVideoPath != null) {
+        Map<String, dynamic> videoData =
+        await uploadVideoToCloudinary(event.newVideoPath!);
+        newVideoUrl = videoData["secure_url"];
+        newImageId = videoData["public_id"];
+      } else {
+        newVideoUrl = oldVideoUrl; // Keep the old video URL if not changed
+        newImageId = oldImageId; // Keep the old image ID
+      }
+
+      // Prepare the update map
+      Map<String, dynamic> updateData = {
+        "title": event.title,
+        "subtitle": event.description,
+        "videoUrl": newVideoUrl, // Ensure the old or new video URL is always set
+        "imageId": newImageId, // Ensure the old or new image ID is always set
+      };
+
+      // Update Firestore document
+      await _firestore.collection("workouts").doc(event.workoutId).update(updateData);
+
+      List<Workout> updatedWorkouts = await fetchCoachWorkouts();
+      emit(WorkoutsLoaded(updatedWorkouts)); // Emit updated list
+    } catch (e) {
+      emit(WorkoutFailure(e.toString()));
+    }
+  }
+
+
+  Future<void> deleteWorkout(String id, String imageId) async {
+    try {
+      // Delete video from Cloudinary
+      await deleteVideoFromCloudinary(imageId);
+
+      // Delete workout from Firestore
+      await _firestore.collection("workouts").doc(id).delete();
+    } catch (e) {
+      throw Exception("Failed to delete workout: $e");
+    }
+  }
+
+  Future<void> deleteVideoFromCloudinary(String imageId) async {
+    try {
+      String cloudinaryUrl =
+          "https://api.cloudinary.com/v1_1/${CloudinaryConstants.CLOUDINARY_CLOUD_NAME}/delete_by_token";
+
+      FormData formData = FormData.fromMap({
+        "public_id": imageId, // Public ID of the video
+      });
+
+      Response response = await Dio().post(cloudinaryUrl, data: formData);
+
+      if (response.statusCode != 200) {
+        throw Exception("Failed to delete video from Cloudinary");
+      }
+    } catch (e) {
+      print("Error deleting video: $e");
+      throw e;
+    }
+  }}
+
+  Future<void> deleteVideoFromCloudinary(String publicId) async {
+    try {
+      String cloudinaryUrl =
+          "https://api.cloudinary.com/v1_1/${CloudinaryConstants.CLOUDINARY_CLOUD_NAME}/video/destroy";
+
+      Response response = await Dio().post(cloudinaryUrl, data: {
+        "public_id": publicId,
+        "invalidate": true,
+      });
+
+      if (response.statusCode != 200) {
+        throw Exception("Failed to delete video from Cloudinary");
+      }
+    } catch (e) {
+      print("Error deleting video: $e");
+      throw e;
+    }
+  }
+
+

@@ -14,6 +14,8 @@ import 'package:fynxfitcoaches/bloc/profileimage/profileimage_bloc.dart';
 import 'package:fynxfitcoaches/bloc/profileonboading/profile_onboading_cubit.dart';
 import 'package:fynxfitcoaches/bloc/weight/weight_bloc.dart';
 import 'package:fynxfitcoaches/bloc/workouts/workout_bloc.dart';
+import 'package:fynxfitcoaches/resources/resources_bloc.dart';
+import 'package:fynxfitcoaches/resources/resources_event.dart';
 import 'package:fynxfitcoaches/views/profileonboading/goals_selection.dart';
 import 'package:fynxfitcoaches/views/profileonboading/height_selection.dart';
 import 'package:fynxfitcoaches/views/profileonboading/weight_selection.dart';
@@ -38,6 +40,8 @@ void main() async {
         BlocProvider(create: (context) =>DocumentUploadCubit(),),
         BlocProvider(create: (context) =>ProfileImageCubit(),),
         BlocProvider(create: (context) =>FitnessGoalBloc()..add(LoadGoals(),)),
+         BlocProvider(
+          create: (context) => ResourceBloc()..add(LoadArticles()),),
       ],child:  MyApp()));
 }
 

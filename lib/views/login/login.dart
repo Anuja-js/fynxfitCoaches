@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:fynxfitcoaches/bloc/auth/auth_state.dart';
 import 'package:fynxfitcoaches/theme.dart';
 import 'package:fynxfitcoaches/utils/constants.dart';
 import 'package:fynxfitcoaches/views/home/home.dart';
+import 'package:fynxfitcoaches/views/login/error_login.dart';
 import 'package:fynxfitcoaches/views/main_page/main_screen.dart';
 import 'package:fynxfitcoaches/views/signup/sign_up.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_elevated_button.dart';
@@ -52,15 +54,45 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.all(15),
               child: BlocConsumer<AuthBloc, AuthState>(
-                listener: (context, state) {
+                listener: (context, state) async {
                   if (state is AuthSuccess) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Login Successful!")),
                     );
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (ctx) => MainPage()),
-                    );
+
+                    // Fetch the currently signed-in user
+                    User? user = FirebaseAuth.instance.currentUser;
+
+                    if (user != null) {
+                      // Fetch user details from Firestore
+                      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+                          .collection('coaches') // Change to your Firestore collection
+                          .doc(user.uid)
+                          .get();
+
+                      if (userDoc.exists) {
+                        String? verified = userDoc['verified']; // Ensure 'verified' field exists
+
+                        if (verified == "true") {
+                          // Navigate to the main page if verified
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (ctx) => MainPage()),
+                          );
+                        } else {
+                          // Navigate to an error page if not verified
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (ctx) => ErrorPage()), // Replace with your error page
+                          );
+                        }
+                      } else {
+                        // Handle case where the user document does not exist
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("User data not found. Contact support.")),
+                        );
+                      }
+                    }
                   } else if (state is AuthFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(state.message)),
@@ -71,7 +103,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   return Form(
                     key: formKey,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         CustomTextFormField(
                           controller: _emailController,
@@ -131,8 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     _passwordController.text,
                                   ));
                                 }
-
-
                               },
                             ),
                           ),

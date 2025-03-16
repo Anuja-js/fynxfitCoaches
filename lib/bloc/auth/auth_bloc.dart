@@ -22,29 +22,77 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         password: event.password,
       );
-      print(userCredential.user.runtimeType);
-      final user = userCredential.user;
-      print(user.runtimeType);
-      if (user != null) {
-        await _updateUserLoginTime(user);
-        emit(AuthSuccess(user));
 
-        return null;
-      }
-      return "Login failed. User not found.";
-    } catch (e) {
-      final authdata = auth.currentUser;
-      if (authdata != null) {
-        await _updateUserLoginTime(authdata);
-        emit(AuthSuccess(authdata));
-        return null;
+      User? user = userCredential.user;
+
+      if (user != null) {
+        // Fetch user verification status from Firestore
+        DocumentSnapshot userDoc = await _firestore.collection('coaches').doc(user.uid).get();
+
+        if (userDoc.exists && userDoc['verified'] == "true") {
+          await _updateUserLoginTime(user);
+          emit(AuthSuccess(user));
+        } else {
+          emit(AuthFailure("Your account is not verified by the admin."));
+        }
       } else {
-        // throw e;
-        emit(AuthFailure(e.toString()));
-        return e.toString();
+        emit(AuthFailure("Login failed. User not found."));
       }
+      return null;
+    } catch (e) {
+          final authdata = auth.currentUser;
+          if (authdata != null) {
+            DocumentSnapshot userDoc = await _firestore.collection('coaches').doc(authdata.uid).get();
+
+            if (userDoc.exists && userDoc['verified'] == "true") {
+              await _updateUserLoginTime(authdata);
+              emit(AuthSuccess(authdata));
+            } else {
+              emit(AuthFailure("Your account is not verified by the admin."));
+            }
+
+            return null;
+          } else {
+            // throw e;
+            emit(AuthFailure(e.toString()));
+            return e.toString();
+          }
+      // emit(AuthFailure(e.toString()));
+      // return e.toString();
     }
   }
+
+  // Future<String?> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
+  //   emit(AuthLoading());
+  //
+  //   try {
+  //     UserCredential userCredential = await auth.signInWithEmailAndPassword(
+  //       email: event.email,
+  //       password: event.password,
+  //     );
+  //     print(userCredential.user.runtimeType);
+  //     final user = userCredential.user;
+  //     print(user.runtimeType);
+  //     if (user != null) {
+  //       await _updateUserLoginTime(user);
+  //       emit(AuthSuccess(user));
+  //
+  //       return null;
+  //     }
+  //     return "Login failed. User not found.";
+  //   } catch (e) {
+  //     final authdata = auth.currentUser;
+  //     if (authdata != null) {
+  //       await _updateUserLoginTime(authdata);
+  //       emit(AuthSuccess(authdata));
+  //       return null;
+  //     } else {
+  //       // throw e;
+  //       emit(AuthFailure(e.toString()));
+  //       return e.toString();
+  //     }
+  //   }
+  // }
 
   Future<String?> _onSignUp(SignUpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
