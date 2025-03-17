@@ -5,6 +5,7 @@ import 'package:fynxfitcoaches/bloc/auth/auth_bloc.dart';
 import 'package:fynxfitcoaches/bloc/auth/auth_event.dart';
 import 'package:fynxfitcoaches/bloc/auth/auth_state.dart';
 import 'package:fynxfitcoaches/resources/resources_bloc.dart';
+import 'package:fynxfitcoaches/resources/resources_event.dart';
 import 'package:fynxfitcoaches/resources/resources_state.dart';
 import 'package:fynxfitcoaches/theme.dart';
 import 'package:fynxfitcoaches/utils/constants.dart';
@@ -320,72 +321,83 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget buildResourcesSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const CustomText(
-                text: 'Resources',
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (ctx) {
-                    return ResourcesPage();
-                  }));
-                },
-                child: Row(
-                  children: [
-                    CustomText(
-                      text: 'See All',
-                      color: AppThemes.darkTheme.appBarTheme.foregroundColor!,
+    return BlocProvider(
+        create: (context) =>
+        ResourceBloc()
+          ..add(LoadArticles()),
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const CustomText(
+                    text: 'Resources',
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (ctx) {
+                        return ResourcesPage();
+                      }));
+                    },
+                    child: Row(
+                      children: [
+                        CustomText(
+                          text: 'See All',
+                          color: AppThemes.darkTheme.appBarTheme
+                              .foregroundColor!,
+                        ),
+                        Icon(
+                          Icons.chevron_right,
+                          size: 16,
+                          color: AppThemes.darkTheme.appBarTheme
+                              .foregroundColor,
+                        ),
+                      ],
                     ),
-                    Icon(
-                      Icons.chevron_right,
-                      size: 16,
-                      color: AppThemes.darkTheme.appBarTheme.foregroundColor,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        BlocBuilder<ResourceBloc, ResourceState>(
-          builder: (context, state) {
-            if (state is ResourceLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ArticlesLoaded) {
-              return SizedBox(
-                width: double.infinity,
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount:
+            ),
+            BlocBuilder<ResourceBloc, ResourceState>(
+              builder: (context, state) {
+                if (state is ResourceLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is ArticlesLoaded) {
+                  return SizedBox(
+                    width: double.infinity,
+                    height: 150,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount:
                       state.articles.length > 2 ? 2 : state.articles.length,
-                  itemBuilder: (context, index) {
-                    var article = state.articles[index];
-                    return ResourceCard(
-                      title: article["title"],
-                      subtitle: article["subtitle"],
-                      imageUrl: article["imageUrl"],
-                    );
-                  },
-                ),
-              );
-            } else if (state is ResourceError) {
-              return Center(child: Text(state.message));
-            }
-            return const CustomText(text: "No Resources available");
-          },
-        ),
-      ],
+                      itemBuilder: (context, index) {
+                        var article = state.articles[index];
+                        return ResourceCard(
+                          title: article["title"],
+                          subtitle: article["subtitle"],
+                          imageUrl: article["imageUrl"],
+                        );
+                      },
+                    ),
+                  );
+                } else if (state is ResourceError) {
+                  return Center(child: Text(state.message));
+                }
+                return const CustomText(text: "No Resources available");
+              },
+            ),
+          ],
+        )
     );
+
+
+
   }
 
   Widget buildMenuOption(

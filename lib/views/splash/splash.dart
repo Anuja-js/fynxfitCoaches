@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fynxfitcoaches/theme.dart';
+import 'package:fynxfitcoaches/views/login/error_login.dart';
 import 'package:fynxfitcoaches/views/login/login.dart';
 import 'package:fynxfitcoaches/views/main_page/main_screen.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_splash_icon.dart';
@@ -20,12 +21,18 @@ class SplashScreen extends StatelessWidget {
       child: Scaffold(backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
         body: BlocListener<SplashBloc, SplashState>(
           listener: (context, state) {
-            if (state is UserLoggedIn) {
+
+            if (state is UserVerified) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => MainPage()),
               );
-            } else if (state is UserNotLoggedIn) {
+            } else if (state is UserNotVerified) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const ErrorPage()),
+              );
+            }  else if (state is UserNotLoggedIn) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),

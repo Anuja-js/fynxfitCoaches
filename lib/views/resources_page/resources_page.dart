@@ -15,7 +15,10 @@ class ResourcesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return  BlocProvider(
+      create: (context) => ResourceBloc()..add(LoadArticles()),
+
+    child:  DefaultTabController(
       length: 2,
       child: Scaffold(backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
         appBar: AppBar(backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,automaticallyImplyLeading: false,
@@ -34,7 +37,9 @@ class ResourcesPage extends StatelessWidget {
           ],
         ),
       ),
-    );
+    )
+
+);
   }
 }
 class ArticlesTab extends StatelessWidget {

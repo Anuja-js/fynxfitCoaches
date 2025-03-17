@@ -104,13 +104,17 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
           ),
           TextButton(
             onPressed: () {
-              context.read<WorkoutBloc>().add(DeleteWorkoutEvent(workoutId: workout.id));
+              context.read<WorkoutBloc>().add(DeleteWorkoutEvent(workoutId: workout.id,
+
+              ));
               Navigator.pop(context);
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),
+
         ],
       ),
     );
   }
+
 }

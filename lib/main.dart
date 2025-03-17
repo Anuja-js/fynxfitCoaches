@@ -39,6 +39,7 @@ void main() async {
         BlocProvider(create: (context) =>HeightBloc(),),
         BlocProvider(create: (context) =>DocumentUploadCubit(),),
         BlocProvider(create: (context) =>ProfileImageCubit(),),
+        BlocProvider(create: (context) =>WorkoutBloc(),),
         BlocProvider(create: (context) =>FitnessGoalBloc()..add(LoadGoals(),)),
          BlocProvider(
           create: (context) => ResourceBloc()..add(LoadArticles()),),

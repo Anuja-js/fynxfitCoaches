@@ -8,6 +8,7 @@ import '../../bloc/workouts/workout_event.dart';
 import '../../bloc/workouts/workout_state.dart';
 import '../../models/workout_model.dart';
 import '../../theme.dart';
+import '../../utils/constants.dart';
 import '../../widgets/customs/custom_elevated_button.dart';
 import '../../widgets/customs/custom_text.dart';
 import '../../widgets/customs/custom_text_field.dart';
@@ -44,6 +45,7 @@ class _EditWorkoutPageState extends State<EditWorkoutPage> {
   }
 
   void _updateWorkout() {
+    print("oooooooooooooooooooooooooooooooooo");
     if (titleController.text.isNotEmpty) {
       context.read<WorkoutBloc>().add(
         UpdateWorkoutEvent(
@@ -56,6 +58,9 @@ class _EditWorkoutPageState extends State<EditWorkoutPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Updating workout...")),
       );
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx){
+        return MainPage();
+      }));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Title cannot be empty")),
@@ -132,15 +137,10 @@ class _EditWorkoutPageState extends State<EditWorkoutPage> {
                             text: "Update Workout",
                             backgroundColor: AppThemes.darkTheme.primaryColor,
                             textColor: Colors.white,
-                            onPressed: ()async{await _updateWorkout;
-
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (ctx){
-                                return MainPage();
-                              }));
-                              },
+                            onPressed: _updateWorkout
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        sw10,
                         Expanded(
                           child: CustomElevatedButton(
                             text: "Cancel",

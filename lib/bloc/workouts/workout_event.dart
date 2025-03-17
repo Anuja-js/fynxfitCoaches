@@ -45,14 +45,11 @@ class UpdateWorkoutEvent extends WorkoutEvent {
 // }
 
 // 🔹 Delete Workout
+
 class DeleteWorkoutEvent extends WorkoutEvent {
   final String workoutId;
 
   DeleteWorkoutEvent({required this.workoutId});
-
-  @override
-  List<Object?> get props => [workoutId];
 }
-
 
 

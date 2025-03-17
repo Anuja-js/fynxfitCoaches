@@ -60,8 +60,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SnackBar(content: Text("Login Successful!")),
                     );
 
+
                     // Fetch the currently signed-in user
-                    User? user = FirebaseAuth.instance.currentUser;
+                    User? user = await FirebaseAuth.instance.currentUser;
 
                     if (user != null) {
                       // Fetch user details from Firestore
@@ -71,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           .get();
 
                       if (userDoc.exists) {
-                        String? verified = userDoc['verified']; // Ensure 'verified' field exists
+                        String? verified = userDoc['verified'].toString(); // Ensure 'verified' field exists
 
                         if (verified == "true") {
                           // Navigate to the main page if verified

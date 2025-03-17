@@ -29,12 +29,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // Fetch user verification status from Firestore
         DocumentSnapshot userDoc = await _firestore.collection('coaches').doc(user.uid).get();
 
-        if (userDoc.exists && userDoc['verified'] == "true") {
+        // if (userDoc.exists && userDoc['verified'] == "true") {
           await _updateUserLoginTime(user);
           emit(AuthSuccess(user));
-        } else {
-          emit(AuthFailure("Your account is not verified by the admin."));
-        }
+        // } else {
+        //   emit(AuthFailure("Your account is not verified by the admin."));
+        // }
       } else {
         emit(AuthFailure("Login failed. User not found."));
       }
@@ -44,12 +44,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           if (authdata != null) {
             DocumentSnapshot userDoc = await _firestore.collection('coaches').doc(authdata.uid).get();
 
-            if (userDoc.exists && userDoc['verified'] == "true") {
+            // if (userDoc.exists && userDoc['verified'] == "true") {
               await _updateUserLoginTime(authdata);
               emit(AuthSuccess(authdata));
-            } else {
-              emit(AuthFailure("Your account is not verified by the admin."));
-            }
+            // } else {
+            //   emit(AuthFailure("Your account is not verified by the admin."));
+            // }
 
             return null;
           } else {
