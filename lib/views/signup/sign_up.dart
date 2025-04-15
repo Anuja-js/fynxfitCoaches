@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,6 +7,7 @@ import 'package:fynxfitcoaches/bloc/auth/auth_event.dart';
 import 'package:fynxfitcoaches/bloc/auth/auth_state.dart';
 import 'package:fynxfitcoaches/theme.dart';
 import 'package:fynxfitcoaches/utils/constants.dart';
+import 'package:fynxfitcoaches/views/main_page/main_screen.dart';
 import 'package:fynxfitcoaches/views/profileonboading/profile_onboading_main.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_elevated_button.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_images.dart';
@@ -52,22 +54,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
             Padding(
               padding: const EdgeInsets.all(15),
               child: BlocConsumer<AuthBloc, AuthState>(
-                listener: (context, state) {
+                listener: (context, state) async {
                   if (state is AuthSuccess) {
+                    String userId = state.user.uid;
+
+                    // 🔹 Check Firestore if onboarding is complete
+                    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(userId)
+                        .get();
+
+                    bool isOnboardingComplete = userDoc.exists && (userDoc['profileOnboarding'] ?? false);
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Sign Up Successful!")),
                     );
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => ProfileOnboadingMain(userId: state.user.uid)),
-                    );
-                  } else if (state is AuthFailure) {
+
+                    // 🔹 Navigate based on onboarding status
+                    if (isOnboardingComplete) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()), // Main dashboard
+                      );
+                    } else {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfileOnboadingMain(userId: userId)),
+                      );
+                    }
+                  }
+                  else if (state is AuthFailure) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text(state.message)),
                     );
                   }
-                },
-                builder: (context, state) {
+                },builder:  (context, state) {
                   return Form(
                     key: formKey,
                     child: Column(

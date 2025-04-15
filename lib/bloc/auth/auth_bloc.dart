@@ -62,38 +62,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  // Future<String?> _onLogin(LoginEvent event, Emitter<AuthState> emit) async {
-  //   emit(AuthLoading());
-  //
-  //   try {
-  //     UserCredential userCredential = await auth.signInWithEmailAndPassword(
-  //       email: event.email,
-  //       password: event.password,
-  //     );
-  //     print(userCredential.user.runtimeType);
-  //     final user = userCredential.user;
-  //     print(user.runtimeType);
-  //     if (user != null) {
-  //       await _updateUserLoginTime(user);
-  //       emit(AuthSuccess(user));
-  //
-  //       return null;
-  //     }
-  //     return "Login failed. User not found.";
-  //   } catch (e) {
-  //     final authdata = auth.currentUser;
-  //     if (authdata != null) {
-  //       await _updateUserLoginTime(authdata);
-  //       emit(AuthSuccess(authdata));
-  //       return null;
-  //     } else {
-  //       // throw e;
-  //       emit(AuthFailure(e.toString()));
-  //       return e.toString();
-  //     }
-  //   }
-  // }
-
   Future<String?> _onSignUp(SignUpEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
 
@@ -113,6 +81,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           'email': user.email,
           'verified': "false",
           'createdAt': FieldValue.serverTimestamp(),
+          "profileonboading":false
         });
 
         print("User stored in Firestore successfully");
@@ -129,7 +98,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           'uid': authdata.uid,
           'email': authdata.email,
           'createdAt': FieldValue.serverTimestamp(),
-          'verified': "false"
+          'verified': "false",
+          "profileonboading":false
         });
         await auth.signOut();
 

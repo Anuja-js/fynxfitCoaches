@@ -14,7 +14,7 @@ class CloudinaryConstants {
  static const String CLOUDINARY_API_KEY = "413491413778726";
  static const String CLOUDINARY_API_SECRET = "GBuMHcOy845fjoI8-2R36MR7UEE";
  static const String CLOUDINARY_UPLOAD_PRESET = "preset-for-image-upload";
-
+ static String authToken = base64Encode(utf8.encode("$CLOUDINARY_API_KEY:$CLOUDINARY_API_SECRET"));
 
   static String getSignature(String publicId) {
    int timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;

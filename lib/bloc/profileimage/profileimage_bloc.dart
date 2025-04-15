@@ -48,7 +48,7 @@ class ProfileImageCubit extends Cubit<ProfileImageState> {
 
       emit(ProfileImageState(imageUrlprofile: imageUrl, isLoadingprofile: false));
 
-      await saveToFirestore(imageUrl, publicId, userId);
+      await saveToFirestore(imageUrl, publicId, userId,);
     } else {
       emit(ProfileImageState(isLoadingprofile: false, errorprofile: "Upload failed"));
     }
@@ -58,6 +58,7 @@ class ProfileImageCubit extends Cubit<ProfileImageState> {
     await firestore.collection('coaches').doc(userId).set({
       'uid': userId,
       'profileImage': imageUrl,
+      "profileonboading":true,
       'cloudinaryProfileImageIdProfile': publicId,
     }, SetOptions(merge: true));
   }

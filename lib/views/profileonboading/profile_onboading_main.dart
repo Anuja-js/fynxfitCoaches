@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fynxfitcoaches/bloc/profileonboading/profile_onboading_cubit.dart';
 import 'package:fynxfitcoaches/theme.dart';
+import 'package:fynxfitcoaches/views/profileonboading/basic_info.dart';
 import 'package:fynxfitcoaches/views/profileonboading/birthday_date.dart';
 import 'package:fynxfitcoaches/views/profileonboading/document.dart';
 import 'package:fynxfitcoaches/views/profileonboading/gender_selection.dart';
@@ -39,10 +40,10 @@ class _ProfileOnboadingMainState extends State<ProfileOnboadingMain> {
             physics: ScrollPhysics(),
             children: [
               GenderSelectionScreen(userId: widget.userId, controller: pagecntroller),
+              BasicInformationScreen(controller: pagecntroller, uid: widget.userId),
               BirthdayScreen(controller: pagecntroller, uid:widget.userId,),
               WeightScreen(controller: pagecntroller, uid:widget.userId),
               HeightScreen(controller: pagecntroller,uid: widget.userId,),
-        
               DocumentUploadScreen(controller: pagecntroller,uid: widget.userId,), 
               ProfileImageScreen(controller: pagecntroller,uid: widget.userId,),
             ],
@@ -54,11 +55,11 @@ class _ProfileOnboadingMainState extends State<ProfileOnboadingMain> {
             child: Center(
               child: SmoothPageIndicator(
                 controller: pagecntroller,
-                count: 6,
+                count: 7,
                 effect: WormEffect(
                   dotColor: Colors.grey,
                   activeDotColor: Colors.purple,
-                  dotWidth: 55.w,
+                  dotWidth: 45.w,
                   dotHeight: 8.h,
                 ),
               ),

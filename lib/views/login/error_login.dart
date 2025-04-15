@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fynxfitcoaches/theme.dart';
-
-import '../../widgets/customs/custom_text.dart';
-
 class ErrorPage extends StatefulWidget {
   const ErrorPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ErrorPageState createState() => _ErrorPageState();
 }
 
@@ -25,8 +22,8 @@ class _ErrorPageState extends State<ErrorPage>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1), // Starts from bottom
-      end: Offset.zero, // Moves to normal position
+      begin: const Offset(0, 1),
+      end: Offset.zero,
     ).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );

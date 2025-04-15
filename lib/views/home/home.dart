@@ -35,7 +35,7 @@ class HomeScreen extends StatelessWidget {
           backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
           body: Column(
             children: [
-              _buildAppBar(context),
+              buildAppBar(context),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
@@ -47,7 +47,7 @@ class HomeScreen extends StatelessWidget {
                       buildWeeklyChallenge(),
                       buildCreateWorkouts(context),
                       buildCreateArticles(context),
-                      const SizedBox(height: 20),
+                    sh20,
                     ],
                   ),
                 ),
@@ -57,7 +57,7 @@ class HomeScreen extends StatelessWidget {
         ));
   }
 
-  Widget _buildAppBar(BuildContext context) {
+  Widget buildAppBar(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height / 6,
       width: MediaQuery.of(context).size.width,
@@ -67,7 +67,7 @@ class HomeScreen extends StatelessWidget {
           colors: [
             Colors.black,
             AppThemes.darkTheme.primaryColor
-          ], // Subtle gradient effect
+          ],
           begin: Alignment.bottomCenter,
           end: Alignment.topCenter,
         ),
@@ -151,7 +151,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget buildMainCategories() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -175,7 +174,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
   Widget buildCategoryItem(IconData icon, String label, Color color) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -187,7 +185,6 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
-
   Widget buildRecommendationSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,7 +223,6 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
-
   Widget buildWorkoutCard(String title, String subtitle, String duration,
       String calories, String imagePath) {
     return Container(

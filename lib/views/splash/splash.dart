@@ -35,36 +35,47 @@ class SplashScreen extends StatelessWidget {
             }  else if (state is UserNotLoggedIn) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
               );
             }
           },
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Column(
-              children: [
-                const Expanded(child: Center(child: IconSplashImage())),
-                CustomText(
-                  text: "Trainer Hub",
-                  color: AppThemes.darkTheme.appBarTheme.foregroundColor!,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15.sp,
-                  textAlign: TextAlign.center,
-                ), CustomText(
-                  text: "EAT. SLEEP. WORKOUT",
-                  color: AppThemes.darkTheme.primaryColor,
-                  fontSize: 15.sp,
-                  textAlign: TextAlign.center,
-                ),
-                CustomText(
-                  text: "Powered by Passion",
-                  color: AppThemes.darkTheme.primaryColor,
-                  fontSize: 10.sp,
-                )
-              ],
-            ),
-          ),
+          child: const BaseTextsSession(),
         ),
+      ),
+    );
+  }
+}
+
+class BaseTextsSession extends StatelessWidget {
+  const BaseTextsSession({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(15),
+      child: Column(
+        children: [
+          const Expanded(child: Center(child: IconSplashImage())),
+          CustomText(
+            text: "Trainer Hub",
+            color: AppThemes.darkTheme.appBarTheme.foregroundColor!,
+            fontWeight: FontWeight.bold,
+            fontSize: 15.sp,
+            textAlign: TextAlign.center,
+          ), CustomText(
+            text: "EAT. SLEEP. WORKOUT",
+            color: AppThemes.darkTheme.primaryColor,
+            fontSize: 15.sp,
+            textAlign: TextAlign.center,
+          ),
+          CustomText(
+            text: "Powered by Passion",
+            color: AppThemes.darkTheme.primaryColor,
+            fontSize: 10.sp,
+          )
+        ],
       ),
     );
   }

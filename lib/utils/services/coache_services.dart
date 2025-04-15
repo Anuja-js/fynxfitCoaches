@@ -50,5 +50,27 @@ class CoachService {
     }
   }
 
+  Future<void> saveCoachBasicInfo({
+  required String userId,
+  required String name,
+  required String experience,
+  required String expertise,
+  required String bio,
+  }) async {
+  try {
+  await _firestore.collection('coaches').doc(userId).set({
+  'uid': userId,
+  'name': name,
+  'experience': experience,
+  'expertise': expertise,
+  'bio': bio,
+  }, SetOptions(merge: true)); // Prevents overwriting existing data
 
-}
+  print("Basic Information saved successfully");
+  } catch (e) {
+  print("Error saving basic info: $e");
+  }
+  }
+  }
+
+

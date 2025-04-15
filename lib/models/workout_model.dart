@@ -5,16 +5,31 @@ class Workout {
   final String title;
   final String description;
   final String coachId;
+  final String videoId;
   final DateTime createdAt;
   final String videoUrl;
+  final String advantage;
+  final String repetitions;
+  final String set;
+  final String category;
+  final String intensity;
+  final String muscle;
+  final String thumbnailUrl;
 
   Workout({
     required this.id,
     required this.title,
     required this.description,
     required this.coachId,
+    required this.videoId,
     required this.createdAt,
-    required this.videoUrl
+    required this.videoUrl,
+    required this.category,
+    required this.set,
+    required this.advantage,
+    required this.intensity,
+    required this.muscle,
+    required this.repetitions,required this.thumbnailUrl
   });
 
   // 🔹 Convert Firestore Document to Workout Model
@@ -23,10 +38,18 @@ class Workout {
     return Workout(
       id: doc.id,
       title: data['title'] ?? '',
-      description: data['subtitle'] ?? '',
-      coachId: data['userId'] ?? '',
+      description: data['subtitle'] ?? '', // ✅ Fixed the key
+      coachId: data['coachId'] ?? '',
+      videoId: data['videoId'] ?? '',
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       videoUrl: data['videoUrl'] ?? '',
+      thumbnailUrl: data['thumbnailUrl'] ?? '',
+      advantage: data['advantages'] ?? '',
+      repetitions: data['repetitions'] ?? '',
+      set: data['sets'] ?? '',
+      category: data['category'] ?? '',
+      intensity: data['intensity'] ?? '',
+      muscle: data['muscle'] ?? '',
     );
   }
 
@@ -34,10 +57,18 @@ class Workout {
   Map<String, dynamic> toFirestore() {
     return {
       "title": title,
-      "description": description,
+      "subtitle": description,
+      "videoId": videoId,
       "coachId": coachId,
       "createdAt": FieldValue.serverTimestamp(),
-      "videoUrl":videoUrl
+      "videoUrl": videoUrl,
+      "thumbnailUrl":thumbnailUrl,
+      "advantages": advantage,
+      "repetitions": repetitions,
+      "sets": set,
+      "category": category,
+      "intensity": intensity,
+      "muscle": muscle,
     };
   }
 }

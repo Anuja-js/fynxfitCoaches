@@ -39,7 +39,9 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
           if (state is WorkoutLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is WorkoutsLoaded) {
-            return ListView.builder(
+            return state.workouts.length<=0?
+            CustomText(text: "No Workouts Added"):
+            ListView.builder(
               padding: const EdgeInsets.all(12.0),
               itemCount: state.workouts.length,
               itemBuilder: (context, index) {
@@ -66,14 +68,14 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
                           icon: const Icon(Icons.edit, color: Colors.white),
                           onPressed: () {
                             Navigator.push(context, MaterialPageRoute(builder: (ctx) {
-                              return EditWorkoutPage(workout: workout);
+                              return WorkoutEditPage(workout: workout, );
                             }));
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () {
-                            _showDeleteConfirmation(context, workout);
+                            showDeleteConfirmation(context, workout);
                           },
                         ),
                       ],
@@ -82,8 +84,9 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
                 );
               },
             );
-          } else if (state is WorkoutFailure) {
-            return Center(child: CustomText(text: "Error: ${state.error}"));
+          } else if (state is WorkoutFailure) { print(state.error);
+            return Center(child: CustomText(text: "Error: ${state.error}",overflow: TextOverflow.visible,),);
+
           }
           return const Center(child: CustomText(text: "No workouts found."));
         },
@@ -91,7 +94,7 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, Workout workout) {
+  void showDeleteConfirmation(BuildContext context, Workout workout) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -105,6 +108,7 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
           TextButton(
             onPressed: () {
               context.read<WorkoutBloc>().add(DeleteWorkoutEvent(workoutId: workout.id,
+                videoId:workout.videoId
 
               ));
               Navigator.pop(context);

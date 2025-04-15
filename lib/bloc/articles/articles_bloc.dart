@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
@@ -11,14 +13,14 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   ArticlesBloc() : super(ArticlesInitial()) {
-    on<UploadArticlesEvent>(_uploadArticleImage);
-    on<DeleteArticlesEvent>(_deleteArticleImage);
-    on<FetchCoachArticlesEvent>(_fetchCoachArticles);
-    on<UpdateArticlesEvent>(_updateArticle);// New event
-    on<DeleteCoachArticleEvent>(_onDeleteArticle);
+    on<UploadArticlesEvent>(uploadArticleImage);
+    on<DeleteArticlesEvent>(deleteArticle);
+    on<FetchCoachArticlesEvent>(fetchCoachArticles);
+    on<UpdateArticlesEvent>(updateArticle);// New event
+    // on<DeleteCoachArticleEvent>(_onDeleteArticle);
   }
 
-  Future<void> _uploadArticleImage(UploadArticlesEvent event, Emitter<ArticlesState> emit) async {
+  Future<void> uploadArticleImage(UploadArticlesEvent event, Emitter<ArticlesState> emit) async {
     emit(ArticlesLoading());
 
     try {
@@ -52,34 +54,34 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
     }
   }
 
-  Future<void> _deleteArticleImage(DeleteArticlesEvent event, Emitter<ArticlesState> emit) async {
-    emit(ArticlesLoading());
-
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        emit(ArticlesFailure("User is not authenticated"));
-        return;
-      }
-
-      // Fetch the article document to check the owner
-      DocumentSnapshot doc = await _firestore.collection("Articles").doc(event.documentId).get();
-      if (!doc.exists || doc["userId"] != user.uid) {
-        emit(ArticlesFailure("You don't have permission to delete this article"));
-        return;
-      }
-
-      // Delete from Cloudinary
-      await deleteImageFromCloudinary(event.imageId);
-
-      // Delete from Firestore
-      await _firestore.collection("Articles").doc(event.documentId).delete();
-
-      emit(ArticlesDelete());
-    } catch (e) {
-      emit(ArticlesFailure(e.toString()));
-    }
-  }
+  // Future<void> _deleteArticleImage(DeleteArticlesEvent event, Emitter<ArticlesState> emit) async {
+  //   emit(ArticlesLoading());
+  //
+  //   try {
+  //     final user = FirebaseAuth.instance.currentUser;
+  //     if (user == null) {
+  //       emit(ArticlesFailure("User is not authenticated"));
+  //       return;
+  //     }
+  //
+  //     // Fetch the article document to check the owner
+  //     DocumentSnapshot doc = await _firestore.collection("Articles").doc(event.documentId).get();
+  //     if (!doc.exists || doc["userId"] != user.uid) {
+  //       emit(ArticlesFailure("You don't have permission to delete this article"));
+  //       return;
+  //     }
+  //
+  //     // Delete from Cloudinary
+  //     await deleteImageFromCloudinary(event.imageId);
+  //
+  //     // Delete from Firestore
+  //     await _firestore.collection("Articles").doc(event.documentId).delete();
+  //
+  //     emit(ArticlesDelete());
+  //   } catch (e) {
+  //     emit(ArticlesFailure(e.toString()));
+  //   }
+  // }
 
   Future<Map<String, String>> uploadImageToCloudinary(String filePath) async {
     try {
@@ -132,7 +134,7 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
       throw e;
     }
   }
-  Future<void> _fetchCoachArticles(FetchCoachArticlesEvent event, Emitter<ArticlesState> emit) async {
+  Future<void> fetchCoachArticles(FetchCoachArticlesEvent event, Emitter<ArticlesState> emit) async {
     emit(ArticlesLoading());
 
     try {
@@ -165,7 +167,7 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
       emit(ArticlesFailure(e.toString()));
     }
   }
-  Future<void> _updateArticle(UpdateArticlesEvent event, Emitter<ArticlesState> emit) async {
+  Future<void> updateArticle(UpdateArticlesEvent event, Emitter<ArticlesState> emit) async {
     emit(ArticlesLoading());
 
     try {
@@ -212,43 +214,105 @@ class ArticlesBloc extends Bloc<ArticlesEvent, ArticlesState> {
       emit(ArticlesFailure(e.toString()));
     }
   }
-  Future<void> _onDeleteArticle(
-      DeleteCoachArticleEvent event, Emitter<ArticlesState> emit) async {
+  Future<void> deleteArticle(DeleteArticlesEvent event, Emitter<ArticlesState> emit) async {
+    emit(ArticlesLoading());
+
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        emit(ArticlesFailure("User not authenticated"));
-        return;
-      }
+      await deleteCloudinaryimage(event.imageId);
 
-      // Delete article from Firestore
-      await _firestore.collection('Articles').doc(event.articleId).delete();
+      await _firestore.collection("Articles").doc(event.imageId).delete();
 
-      // Fetch updated list of articles
-      QuerySnapshot querySnapshot = await _firestore
-          .collection("Articles")
-          .where("userId", isEqualTo: user.uid)
-          .get();
+      // Re-fetch articles after deletion
+      add(FetchCoachArticlesEvent());
 
-      List<ArticleModel> articles = querySnapshot.docs.map((doc) {
-        return ArticleModel(
-          documentId: doc.id,
-          title: doc["title"]?.toString() ?? "Untitled",
-          subtitle: doc["subtitle"]?.toString() ?? "No description",
-          imageUrl: doc["imageUrl"]?.toString() ?? "",
-          createdAt: (doc["createdAt"] as Timestamp?)?.toDate() ?? DateTime.now(),
-          userId: doc["userId"]?.toString() ?? "",
-          imageId: doc["imageId"]?.toString() ?? "",
-        );
-      }).toList();
-
-      // Emit success state with updated articles list
-      emit(ArticlesSuccess(articles));
     } catch (e) {
-      emit(ArticlesFailure("Failed to delete article: ${e.toString()}"));
+      emit(ArticlesFailure("❌ Failed to delete article: ${e.toString()}"));
+    }
+  }
+  Future<void> deleteCloudinaryimage(String publicId) async {
+    try {
+      String cloudName = "dswwx1kl4";
+      String apiKey = "413491413778726";
+      String apiSecret = "GBuMHcOy845fjoI8-2R36MR7UEE";
+
+      String authToken = base64Encode(utf8.encode("$apiKey:$apiSecret"));
+
+      String url = "https://api.cloudinary.com/v1_1/$cloudName/image/destroy";
+
+      Map<String, dynamic> params = {
+        "public_ids": publicId,
+      };
+      Response response = await Dio().delete(
+        url,
+        data: params,
+        options: Options(
+          headers: {
+            "Authorization": "Basic $authToken",
+            "Content-Type": "application/json",
+          },
+          validateStatus: (status) {
+            return status! < 500; // Allows Cloudinary to return status codes without throwing an error
+          },
+        ),
+      );
+      // Response response = await Dio().post(
+      //   url,
+      //   data: params,
+      //   options: Options(
+      //     headers: {
+      //       "Authorization": "Basic $authToken",
+      //       "Content-Type": "application/json",
+      //     },
+      //   ),
+      // );
+
+      if (response.statusCode == 200) {
+        print("✅ Cloudinary image deleted successfully");
+      } else {
+        print("⚠️ Failed to delete image. Status: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("❌ Error deleting image from Cloudinary: $e");
     }
   }
 
-
+// Future<void> _onDeleteArticle(
+  //     DeleteCoachArticleEvent event, Emitter<ArticlesState> emit) async {
+  //   try {
+  //     final user = FirebaseAuth.instance.currentUser;
+  //     if (user == null) {
+  //       emit(ArticlesFailure("User not authenticated"));
+  //       return;
+  //     }
+  //
+  //     // Delete article from Firestore
+  //     await _firestore.collection('Articles').doc(event.articleId).delete();
+  //
+  //     // Fetch updated list of articles
+  //     QuerySnapshot querySnapshot = await _firestore
+  //         .collection("Articles")
+  //         .where("userId", isEqualTo: user.uid)
+  //         .get();
+  //
+  //     List<ArticleModel> articles = querySnapshot.docs.map((doc) {
+  //       return ArticleModel(
+  //         documentId: doc.id,
+  //         title: doc["title"]?.toString() ?? "Untitled",
+  //         subtitle: doc["subtitle"]?.toString() ?? "No description",
+  //         imageUrl: doc["imageUrl"]?.toString() ?? "",
+  //         createdAt: (doc["createdAt"] as Timestamp?)?.toDate() ?? DateTime.now(),
+  //         userId: doc["userId"]?.toString() ?? "",
+  //         imageId: doc["imageId"]?.toString() ?? "",
+  //       );
+  //     }).toList();
+  //
+  //     // Emit success state with updated articles list
+  //     emit(ArticlesSuccess(articles));
+  //   } catch (e) {
+  //     emit(ArticlesFailure("Failed to delete article: ${e.toString()}"));
+  //   }
+  // }
+  //
+  //
 
 }

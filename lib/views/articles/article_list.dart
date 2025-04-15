@@ -22,7 +22,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
     context.read<ArticlesBloc>().add(FetchCoachArticlesEvent());
   }
 
-  void _confirmDelete(BuildContext context, String articleId) {
+  void _confirmDelete(BuildContext context, String articleId,String docId) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -35,7 +35,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
           ),
           TextButton(
             onPressed: () {
-              context.read<ArticlesBloc>().add(DeleteCoachArticleEvent(articleId));
+              context.read<ArticlesBloc>().add(DeleteArticlesEvent(imageId: articleId,documentId:docId ));
               Navigator.pop(ctx);
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
@@ -109,7 +109,7 @@ class _ArticleListPageState extends State<ArticleListPage> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _confirmDelete(context, article.documentId),
+                          onPressed: () => _confirmDelete(context,article.imageId ,article.documentId,),
                         ),
                       ],
                     ),

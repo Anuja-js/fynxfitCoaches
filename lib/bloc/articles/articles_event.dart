@@ -30,8 +30,8 @@ required this.articleDescription,
 @override
 List<Object> get props => [articleId, imagePath, articleTitle, articleDescription];
 }
-class DeleteCoachArticleEvent extends ArticlesEvent {
-  final String articleId;
-
-  DeleteCoachArticleEvent(this.articleId);
-}
+// class DeleteCoachArticleEvent extends ArticlesEvent {
+//   final String articleId;
+//
+//   DeleteCoachArticleEvent(this.articleId);
+// }

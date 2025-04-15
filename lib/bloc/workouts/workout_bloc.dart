@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
@@ -15,8 +14,8 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   WorkoutBloc() : super(WorkoutInitial()) {
-    on<UploadWorkoutVideoEvent>(_uploadWorkoutVideo);
-    on<DeleteWorkoutEvent>(_deleteWorkout);
+    on<UploadWorkoutVideoEvent>(uploadWorkoutVideo);
+    on<DeleteWorkoutEvent>(deleteWorkout);
 
     on<FetchCoachWorkoutsEvent>((event, emit) async {
       emit(WorkoutLoading());
@@ -27,10 +26,10 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
         emit(WorkoutFailure(e.toString()));
       }
     });
-    on<UpdateWorkoutEvent>(_updateWorkout);
+    on<UpdateWorkoutEvent>(updateWorkout);
   }
 
-  Future<void> _uploadWorkoutVideo(UploadWorkoutVideoEvent event,
+  Future<void> uploadWorkoutVideo(UploadWorkoutVideoEvent event,
       Emitter<WorkoutState> emit) async {
     emit(WorkoutLoading());
 
@@ -44,12 +43,22 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
       Map<String, dynamic> videoData =
       await uploadVideoToCloudinary(event.videoPath);
 
+      Map<String, dynamic> thumnailData= await uploadImageToCloudinary(event.thumbnailPath);
       DocumentReference docRef =
       await _firestore.collection("workouts").add({
         "title": event.workoutTitle,
         "subtitle": event.workoutDescription,
+        "advantages":event.workoutAdvantage,
+        "repetitions":event.workoutRepetition,
+        "sets":event.
+          workoutSet,
+        "category":event.workoutCategory,
+        "intensity":event.workoutIntensity,
+       "muscle" :event.workoutMuscle,
+        'thumbUrl':thumnailData["secure_url"],
+        'thumbid':thumnailData["public_id"],
         "videoUrl": videoData["secure_url"],
-        "imageId": videoData["public_id"],
+        "videoId": videoData["public_id"],
         "createdAt": FieldValue.serverTimestamp(),
         "userId": user.uid,
       });
@@ -57,6 +66,7 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
       await docRef.update({"documentId": docRef.id});
 
       emit(WorkoutSuccess());
+
     } catch (e) {
       emit(WorkoutFailure(e.toString()));
     }
@@ -110,131 +120,150 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
     return _auth.currentUser?.uid;
   }
 
-  Future<void> _updateWorkout(UpdateWorkoutEvent event,
-      Emitter<WorkoutState> emit) async {
-    print("jhgcfdooooooooooooooooo0");
+
+
+  Future<void> updateWorkout(
+      UpdateWorkoutEvent event, Emitter<WorkoutState> emit) async {
     emit(WorkoutLoading());
+
     try {
-      String? newVideoUrl;
-      String? newImageId;
-
-      // Fetch the existing workout details
-      DocumentSnapshot docSnapshot =
-      await _firestore.collection("workouts").doc(event.workoutId).get();
-      Map<String, dynamic>? existingData =
-      docSnapshot.data() as Map<String, dynamic>?;
-
-      if (existingData == null) {
-        emit(WorkoutFailure("Workout not found"));
+      final user = _auth.currentUser;
+      if (user == null) {
+        emit(WorkoutFailure("User is not authenticated"));
         return;
       }
+    final doc=  await _firestore.collection("workouts").doc(event.workoutId).get();
 
-      // Retain existing values
-      String oldVideoUrl = existingData["videoUrl"] ?? "";
-      String oldImageId = existingData["imageId"] ?? "";
+      // Upload video if updated
+      String videoUrl = event.videoPath;
+      if (event.videoPath != null && event.videoPath.isNotEmpty) {
+        final videoData = await uploadVideoToCloudinary(event.videoPath);
+        videoUrl = videoData["secure_url"];
+      }else{
+        videoUrl=
+        doc["videoUrl"];
 
-      // If a new video is provided, upload it to Cloudinary
-      if (event.newVideoPath != null) {
-        Map<String, dynamic> videoData =
-        await uploadVideoToCloudinary(event.newVideoPath!);
-        newVideoUrl = videoData["secure_url"];
-        newImageId = videoData["public_id"];
-      } else {
-        newVideoUrl = oldVideoUrl;
-        newImageId = oldImageId;
       }
 
-      // Prepare the update map
-      Map<String, dynamic> updateData = {
-        "title": event.title,
-        "subtitle": event.description,
-        "videoUrl": newVideoUrl,
-        "imageId": newImageId,
+      // Upload thumbnail if updated
+      String thumbnailUrl = event.thumbnailPath;
 
-      };
+      if (event.thumbnailPath != null && event.thumbnailPath.isNotEmpty) {
+        final thumbnailData = await uploadImageToCloudinary(event.thumbnailPath);
+        thumbnailUrl = thumbnailData["secure_url"]!;
+      }else{
+        thumbnailUrl=
+        doc["thumbUrl"];
+
+      }
 
       // Update Firestore document
-      await _firestore.collection("workouts").doc(event.workoutId).update(
-          updateData);
-
+      await _firestore.collection("workouts").doc(event.workoutId).update({
+        "title": event.title,
+        "subtitle": event.description,
+        "advantages": event.workoutAdvantage,
+        "repetitions": event.workoutRepetition,
+        "sets": event.workoutSet,
+        "category": event.workoutCategory,
+        "intensity": event.workoutIntensity,
+        "muscle": event.workoutMuscle,
+        "videoUrl": videoUrl,
+        "thumbnailUrl": thumbnailUrl,
+        "updatedAt": FieldValue.serverTimestamp(),
+      });
       List<Workout> updatedWorkouts = await fetchCoachWorkouts();
-      emit(WorkoutsLoaded(updatedWorkouts)); // Emit updated list
+      emit(WorkoutsLoaded(updatedWorkouts));
+      emit(WorkoutSuccess());
     } catch (e) {
       emit(WorkoutFailure(e.toString()));
     }
   }
 
-  Future<void> _deleteWorkout(
-      DeleteWorkoutEvent event, Emitter<WorkoutState> emit) async {
-    emit(WorkoutLoading()); // Show loading state
+  Future<void> deleteWorkout(DeleteWorkoutEvent event, Emitter<WorkoutState> emit) async {
+    emit(WorkoutLoading());
 
     try {
+      // Delete video from Cloudinary first
+      await deleteCloudinaryVideo(event.videoId);
 
+      // Delete workout from Firestore
       await _firestore.collection("workouts").doc(event.workoutId).delete();
+
+      // Fetch updated workout list
       List<Workout> updatedWorkouts = await fetchCoachWorkouts();
       emit(WorkoutsLoaded(updatedWorkouts));
+
     } catch (e) {
-      emit(WorkoutFailure("Failed to delete workout: ${e.toString()}"));
+      emit(WorkoutFailure("❌ Failed to delete workout: ${e.toString()}"));
+    }
+  }
+  Future<void> deleteCloudinaryVideo(String publicId) async {
+    try {
+      String cloudName = "dswwx1kl4";
+      String apiKey = "413491413778726";
+      String apiSecret = "GBuMHcOy845fjoI8-2R36MR7UEE";
+
+      // Encode API Key & Secret for Basic Authentication
+      String authToken = base64Encode(utf8.encode("$apiKey:$apiSecret"));
+
+      // Correct Cloudinary DELETE URL
+      String url = "https://api.cloudinary.com/v1_1/$cloudName/resources/video/upload";
+
+      // Request body with correct format
+      Map<String, dynamic> params = {
+        "public_ids": [publicId]
+      };
+
+      // Making the DELETE request
+      Response response = await Dio().delete(
+        url,
+        data: params,
+        options: Options(
+          headers: {
+            "Authorization": "Basic $authToken",
+            "Content-Type": "application/json",
+          },
+          validateStatus: (status) {
+            return status! < 500; // Allows Cloudinary to return status codes without throwing an error
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        print("✅ Cloudinary video deleted successfully");
+      } else {
+        print("⚠️ Failed to delete video. Status code: ${response.statusCode}");
+        print("Response: ${response.data}");
+      }
+    } catch (e) {
+      print("❌ Error deleting video from Cloudinary: $e");
+    }
+  }
+  Future<Map<String, String>> uploadImageToCloudinary(String filePath) async {
+    try {
+      String cloudinaryUrl =
+          "https://api.cloudinary.com/v1_1/${CloudinaryConstants.CLOUDINARY_CLOUD_NAME}/image/upload";
+      String uploadPreset = CloudinaryConstants.CLOUDINARY_UPLOAD_PRESET;
+
+      FormData formData = FormData.fromMap({
+        "file": await MultipartFile.fromFile(filePath, filename: "image.jpg"),
+        "upload_preset": uploadPreset,
+      });
+
+      Response response = await Dio().post(cloudinaryUrl, data: formData);
+
+      if (response.statusCode == 200) {
+        return {
+          "secure_url": response.data["secure_url"],
+          "public_id": response.data["public_id"],
+        };
+      } else {
+        throw Exception("Failed to upload image");
+      }
+    } catch (e) {
+      print("Error uploading image: $e");
+      throw e;
     }
   }
 
-//   Future<void> deleteVideoFromCloudinary(String imageId) async {
-//     try {
-//       String cloudinaryUrl =
-//           "https://api.cloudinary.com/v1_1/${CloudinaryConstants.CLOUDINARY_CLOUD_NAME}/video/destroy";
-//
-//       String apiKey = CloudinaryConstants.CLOUDINARY_API_KEY;
-//       String apiSecret = CloudinaryConstants.CLOUDINARY_API_SECRET;
-//       String credentials = "$apiKey:$apiSecret";
-//       String basicAuth = "Basic ${base64Encode(utf8.encode(credentials))}";
-//
-//       // FormData formData = FormData.fromMap({
-//       //   "public_id": imageId, // Video ID on Cloudinary
-//       //   "invalidate": true, // Clears the cache
-//       // });
-//       Map<String,dynamic> formData={
-//           "public_id": imageId, // Video ID on Cloudinary
-//           "invalidate": true, // Clears the cache
-//       }
-// ;
-//       Response response = await Dio().post(
-//         cloudinaryUrl,
-//         data: formData,
-//         options: Options(
-//           headers: {
-//             "Authorization": basicAuth, // Add authentication header
-//           },
-//         ),
-//       );
-//
-//       if (response.statusCode != 200) {
-//         throw Exception("Failed to delete video from Cloudinary: ${response.data}");
-//       }
-//     } catch (e) {
-//       print("Error deleting video: $e");
-//       throw e;
-//     }
-//   }
-
-
 }
-  // Future<void> deleteVideoFromCloudinary(String publicId) async {
-  //   try {
-  //     String cloudinaryUrl =
-  //         "https://api.cloudinary.com/v1_1/${CloudinaryConstants.CLOUDINARY_CLOUD_NAME}/video/destroy";
-  //
-  //     Response response = await Dio().post(cloudinaryUrl, data: {
-  //       "public_id": publicId,
-  //       "invalidate": true,
-  //     });
-  //
-  //     if (response.statusCode != 200) {
-  //       throw Exception("Failed to delete video from Cloudinary");
-  //     }
-  //   } catch (e) {
-  //     print("Error deleting video: $e");
-  //     throw e;
-  //   }
-  // }
-  //
-  //

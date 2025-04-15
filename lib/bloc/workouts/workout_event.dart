@@ -11,15 +11,36 @@ class UploadWorkoutVideoEvent extends WorkoutEvent {
   final String videoPath;
   final String workoutTitle;
   final String workoutDescription;
-
-  UploadWorkoutVideoEvent({
-    required this.videoPath,
-    required this.workoutTitle,
-    required this.workoutDescription,
-  });
+  final String workoutCategory;
+  final String workoutIntensity;
+  final String workoutMuscle;
+  final String workoutAdvantage;
+  final String workoutRepetition;
+  final String workoutSet;
+  final String thumbnailPath;
+  UploadWorkoutVideoEvent(
+      {required this.videoPath,
+      required this.workoutTitle,
+      required this.workoutDescription,
+      required this.workoutAdvantage,
+      required this.workoutCategory,
+      required this.workoutIntensity,
+      required this.workoutMuscle,
+      required this.workoutRepetition,
+      required this.workoutSet,
+      required this.thumbnailPath
+      });
 
   @override
-  List<Object?> get props => [videoPath, workoutTitle, workoutDescription];
+  List<Object?> get props => [
+        videoPath,
+        workoutTitle,
+        workoutDescription,
+        workoutMuscle,
+        workoutSet,
+        workoutRepetition,
+        workoutAdvantage,workoutIntensity,workoutCategory,thumbnailPath
+      ];
 }
 
 // 🔹 Fetch Workouts for the Logged-in Coach
@@ -29,13 +50,27 @@ class UpdateWorkoutEvent extends WorkoutEvent {
   final String workoutId;
   final String title;
   final String description;
-  final String? newVideoPath; // Nullable for optional video updates
+  final String workoutAdvantage;
+  final String workoutRepetition;
+  final String workoutSet;
+  final String workoutCategory;
+  final String workoutIntensity;
+  final String workoutMuscle;
+  final String videoPath;
+  final String thumbnailPath;
 
   UpdateWorkoutEvent({
     required this.workoutId,
     required this.title,
     required this.description,
-    this.newVideoPath, // Add newVideoPath for video updates
+    required this.workoutAdvantage,
+    required this.workoutRepetition,
+    required this.workoutSet,
+    required this.workoutCategory,
+    required this.workoutIntensity,
+    required this.workoutMuscle,
+    required this.videoPath,
+    required this.thumbnailPath,
   });
 }
 
@@ -48,8 +83,7 @@ class UpdateWorkoutEvent extends WorkoutEvent {
 
 class DeleteWorkoutEvent extends WorkoutEvent {
   final String workoutId;
+  final String videoId;
 
-  DeleteWorkoutEvent({required this.workoutId});
+  DeleteWorkoutEvent({required this.workoutId, required this.videoId});
 }
-
-
