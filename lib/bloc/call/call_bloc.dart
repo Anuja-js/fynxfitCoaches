@@ -10,7 +10,7 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     on<CallInitialize>((event, emit) async {
       emit(CallLoading());
       try {
-        await signaling.initialize();
+        await signaling.initialize(callId: event.callId);
         emit(CallActive(signaling.localRenderer, signaling.remoteRenderer));
       } catch (e) {
         emit(CallError("Init failed: $e"));
@@ -20,12 +20,14 @@ class CallBloc extends Bloc<CallEvent, CallState> {
     on<CallReceive>((event, emit) async {
       emit(CallLoading());
       try {
-        await signaling.receiveCall();
+        String callId = event.callId;
+        await signaling.receiveCall(callId);
         emit(CallActive(signaling.localRenderer, signaling.remoteRenderer));
       } catch (e) {
         emit(CallError("Receiving call failed: $e"));
       }
     });
+
 
     on<CallEnd>((event, emit) async {
       await signaling.disposeResources();

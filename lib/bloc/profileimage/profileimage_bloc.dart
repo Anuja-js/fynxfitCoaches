@@ -43,8 +43,8 @@ class ProfileImageCubit extends Cubit<ProfileImageState> {
 
     if (response.statusCode == 200) {
       final jsonResponse = json.decode(await response.stream.bytesToString());
-      final String imageUrl = jsonResponse['secure_url']; // Get the uploaded image URL
-      final String publicId = jsonResponse['public_id']; // Get Cloudinary image ID
+      final String imageUrl = jsonResponse['secure_url'];
+      final String publicId = jsonResponse['public_id'];
 
       emit(ProfileImageState(imageUrlprofile: imageUrl, isLoadingprofile: false));
 

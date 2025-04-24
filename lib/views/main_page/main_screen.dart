@@ -10,6 +10,8 @@ import 'package:fynxfitcoaches/views/bmi/bmi.dart';
 import 'package:fynxfitcoaches/views/home/home.dart';
 import 'package:fynxfitcoaches/views/message/user_list_chat.dart';
 
+import '../../bloc/bmi/bmi_bloc.dart';
+
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
 
@@ -68,7 +70,10 @@ FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     String? userId = getUserId();
     final List<Widget> screens = [
       const HomeScreen(),
-      BMIScreen(),
+      BlocProvider(
+        create: (_) => BmiBloc(),
+        child: BmiScreen(),
+      ),
      CoachChatListScreen(),
       userId != null ? AccountScreen(userId: userId) : const Center(child: CircularProgressIndicator()),
 

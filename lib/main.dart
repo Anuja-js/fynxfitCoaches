@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:fynxfitcoaches/bloc/BMI/bmi_bloc.dart';
 import 'package:fynxfitcoaches/bloc/articles/articles_bloc.dart';
 import 'package:fynxfitcoaches/bloc/birthday/birthday_bloc.dart';
 import 'package:fynxfitcoaches/bloc/bottomnav/nav_cubit.dart';
@@ -25,6 +26,7 @@ import 'package:fynxfitcoaches/bloc/workouts/workout_bloc.dart';
 import 'package:fynxfitcoaches/controlers/singnal_controler.dart';
 import 'package:fynxfitcoaches/resources/resources_bloc.dart';
 import 'package:fynxfitcoaches/resources/resources_event.dart';
+import 'package:fynxfitcoaches/views/bmi/bmi.dart';
 import 'package:fynxfitcoaches/views/message/user_list_chat.dart';
 import 'package:fynxfitcoaches/views/splash/splash.dart';
 import 'bloc/auth/auth_bloc.dart';
@@ -49,6 +51,9 @@ void main() async {
     ),
     BlocProvider(
       create: (context) => WeightBloc(),
+    ),
+    BlocProvider<BmiBloc>(
+      create: (_) => BmiBloc(),
     ),
     BlocProvider(
       create: (context) => BirthdayBloc(),

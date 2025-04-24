@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fynxfitcoaches/theme.dart';
+import 'package:fynxfitcoaches/views/account/followers_list.dart';
 import 'package:fynxfitcoaches/views/workouts/workout_list.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_text.dart';
 import '../articles/article_list.dart';
@@ -50,6 +51,18 @@ class AccountScreen extends StatelessWidget {
                     }));
                   },
                 ),
+                CustomListTileAccount(
+                  leading: CustomText(
+                    text: "My Followers",
+                    fontSize: 15.sp,
+                  ),
+                  ontap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (ctx) {
+                      return FollowersListScreen(userId: userId);
+                    }));
+                  },
+                ),
+
               ],
             ));
   }}

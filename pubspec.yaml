@@ -58,6 +58,7 @@ dependencies:
   intl: ^0.18.1
   firebase_messaging: any
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

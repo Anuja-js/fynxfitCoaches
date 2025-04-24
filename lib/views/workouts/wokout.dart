@@ -10,7 +10,6 @@ import 'package:fynxfitcoaches/utils/constants.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_elevated_button.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_text.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_text_field.dart';
-import 'package:fynxfitcoaches/widgets/workout/category_fetch.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../bloc/category/category_bloc.dart';
@@ -32,6 +31,8 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
   String? selectedCategory;
   String? selectedIntensity;
   String? selectedMuscle;
+  String? selectedPriceOption;
+  String? selectedPrice;
 
 
   final List<String> intensities = ["Beginner", "Intermediate", "Advanced"];
@@ -58,27 +59,37 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
   }
 
   void uploadWorkout() {
-    if (_selectedVideo != null && titleController.text.isNotEmpty) {
+    if (_selectedVideo != null &&
+        selectedThumbnail != null &&
+        titleController.text.isNotEmpty &&
+        selectedIntensity != null &&
+        selectedMuscle != null &&
+        selectedCategory != null &&
+        selectedPriceOption != null&&(selectedPriceOption == "Free" || cashController.text.isNotEmpty)) {
       context.read<WorkoutBloc>().add(
         UploadWorkoutVideoEvent(
           videoPath: _selectedVideo!.path,
           workoutTitle: titleController.text,
           workoutDescription: descriptionController.text,
-          workoutCategory: selectedCategory.toString(),
+          workoutCategory: selectedCategory!,
           workoutIntensity: selectedIntensity!,
           workoutMuscle: selectedMuscle!,
           workoutAdvantage: advantageController.text,
           workoutRepetition: repetitionController.text,
           workoutSet: setController.text,
-          thumbnailPath: selectedThumbnail!.path
+          thumbnailPath: selectedThumbnail!.path,
+          workoutPrice: cashController.text,
+          workoutOption: selectedPriceOption!,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a video and enter a title")),
+        const SnackBar(content: Text("Please fill all required fields")),
       );
     }
   }
+  final List<String> priceOptions = ["Free", "Paid"];
+  final TextEditingController cashController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -180,12 +191,12 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
             ),
                 sh20,
                 DropdownButtonFormField<String>(
-                  value: selectedIntensity,
-                  hint: Text("Select Intensity"),
+                  value: selectedIntensity, dropdownColor: Colors.grey[800],
+                  hint: CustomText(text: "Select Intensity",),
                   items: intensities.map((String intensity) {
                     return DropdownMenuItem<String>(
                       value: intensity,
-                      child: Text(intensity),
+                      child: CustomText(text: intensity,),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -194,14 +205,44 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
                     });
                   },
                 ),
-                sh20,
+                sh10,
                 DropdownButtonFormField<String>(
-                  value: selectedMuscle,
-                  hint: Text("Select Target Muscle"),
+                  value: selectedPriceOption, dropdownColor: Colors.grey[800],
+                  hint: CustomText(text: "Select Price Option"),
+                  items: priceOptions.map((String option) {
+                    return DropdownMenuItem<String>(
+                      value: option,
+                      child: CustomText(text: option,),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    setState(() {
+                      selectedPriceOption = newValue;
+                    });
+                  },
+                ),
+                if (selectedPriceOption == "Paid") ...[
+                  sh20,
+                  TextFormField(
+                    controller: cashController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: "Enter Amount",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+
+                sh10,
+
+
+                DropdownButtonFormField<String>(
+                  value: selectedMuscle, dropdownColor: Colors.grey[800],
+                  hint: CustomText(text: "Select Target Muscle",),
                   items: muscles.map((String muscle) {
                     return DropdownMenuItem<String>(
                       value: muscle,
-                      child: Text(muscle),
+                      child: CustomText(text: muscle,),
                     );
                   }).toList(),
                   onChanged: (newValue) {
@@ -219,6 +260,7 @@ class _WorkoutAddPageState extends State<WorkoutAddPage> {
                   width: 100,
                   fit: BoxFit.cover,
                 ),
+
                 sh10,
                 SizedBox(
                   width: MediaQuery.of(context).size.width,

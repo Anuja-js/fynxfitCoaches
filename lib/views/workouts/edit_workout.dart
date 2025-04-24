@@ -34,10 +34,15 @@ class _WorkoutEditPageState extends State<WorkoutEditPage> {
   final ImagePicker picker = ImagePicker();
   String? selectedCategory, selectedIntensity, selectedMuscle;
   late VideoPlayerController? videoController;
+  String? selectedOption;
+  TextEditingController priceController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    selectedOption = widget.workout.workoutOption;
+    priceController.text = widget.workout.workoutPrice ?? '';
+
     titleController = TextEditingController(text: widget.workout.title);
     descriptionController =
         TextEditingController(text: widget.workout.description);
@@ -89,6 +94,7 @@ class _WorkoutEditPageState extends State<WorkoutEditPage> {
             workoutRepetition: repetitionController.text,
             workoutSet: setController.text,
             thumbnailPath: selectedThumbnail?.path ?? "",
+        workoutPrice:priceController.text, workoutOption:selectedOption!,
           ));
     } else {
       ScaffoldMessenger.of(context)
@@ -187,6 +193,32 @@ class _WorkoutEditPageState extends State<WorkoutEditPage> {
                 sh20,
                 CustomTextField(controller: setController, labelText: "Sets"),
                 sh20,
+                sh20,
+              if(selectedOption!="Free")  CustomTextField(
+                  controller: priceController,
+                  labelText: "Price",
+                  keyboardType: TextInputType.number,
+                ),
+                sh20,
+          DropdownButtonFormField<String>(
+                  value: selectedOption,
+                  decoration: const InputDecoration(
+                    labelText: "Workout Option",
+                    labelStyle: TextStyle(color: Colors.white),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                  ),
+                  dropdownColor: Colors.grey[800],
+                  items: ["Free", "Paid",]
+                      .map((option) => DropdownMenuItem(
+                    value: option,
+                    child: Text(option, style: const TextStyle(color: Colors.white)),
+                  ))
+                      .toList(),
+                  onChanged: (newValue) => setState(() => selectedOption = newValue),
+                ),
+
                 BlocBuilder<CategoryBloc, CategoryState>(
                   builder: (context, state) {
                     if (state is CategoryLoading) {

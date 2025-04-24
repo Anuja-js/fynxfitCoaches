@@ -18,6 +18,9 @@ class UploadWorkoutVideoEvent extends WorkoutEvent {
   final String workoutRepetition;
   final String workoutSet;
   final String thumbnailPath;
+  final String workoutPrice;
+  final String   workoutOption;
+  // final String workoutType;
   UploadWorkoutVideoEvent(
       {required this.videoPath,
       required this.workoutTitle,
@@ -28,7 +31,10 @@ class UploadWorkoutVideoEvent extends WorkoutEvent {
       required this.workoutMuscle,
       required this.workoutRepetition,
       required this.workoutSet,
-      required this.thumbnailPath
+      required this.thumbnailPath,
+        required this.workoutPrice,
+        required this.workoutOption,
+        // required this.workoutType,
       });
 
   @override
@@ -58,6 +64,8 @@ class UpdateWorkoutEvent extends WorkoutEvent {
   final String workoutMuscle;
   final String videoPath;
   final String thumbnailPath;
+  final String workoutPrice;
+  final String workoutOption;
 
   UpdateWorkoutEvent({
     required this.workoutId,
@@ -71,6 +79,9 @@ class UpdateWorkoutEvent extends WorkoutEvent {
     required this.workoutMuscle,
     required this.videoPath,
     required this.thumbnailPath,
+    required this.workoutPrice,
+    required this.workoutOption,
+
   });
 }
 

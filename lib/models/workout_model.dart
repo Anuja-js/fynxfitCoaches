@@ -15,7 +15,8 @@ class Workout {
   final String intensity;
   final String muscle;
   final String thumbnailUrl;
-
+  final String workoutPrice;
+  final String workoutOption;
   Workout({
     required this.id,
     required this.title,
@@ -29,7 +30,9 @@ class Workout {
     required this.advantage,
     required this.intensity,
     required this.muscle,
-    required this.repetitions,required this.thumbnailUrl
+    required this.repetitions,required this.thumbnailUrl,
+    required this.workoutOption,
+    required this.workoutPrice
   });
 
   // 🔹 Convert Firestore Document to Workout Model
@@ -50,6 +53,8 @@ class Workout {
       category: data['category'] ?? '',
       intensity: data['intensity'] ?? '',
       muscle: data['muscle'] ?? '',
+      workoutPrice: data["workoutPrice"]??"",
+      workoutOption: data["workoutOption"]??""
     );
   }
 
@@ -69,6 +74,8 @@ class Workout {
       "category": category,
       "intensity": intensity,
       "muscle": muscle,
+      "workoutOption":workoutOption,
+      "workoutPrice":workoutPrice
     };
   }
 }

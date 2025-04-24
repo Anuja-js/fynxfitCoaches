@@ -61,6 +61,8 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
         "videoId": videoData["public_id"],
         "createdAt": FieldValue.serverTimestamp(),
         "userId": user.uid,
+        "workoutPrice":event.workoutPrice,
+        "workoutOption":event.workoutOption
       });
 
       await docRef.update({"documentId": docRef.id});
@@ -169,6 +171,8 @@ class WorkoutBloc extends Bloc<WorkoutEvent, WorkoutState> {
         "muscle": event.workoutMuscle,
         "videoUrl": videoUrl,
         "thumbnailUrl": thumbnailUrl,
+        "workoutPrice":event.workoutPrice,
+        "workoutOption":event.workoutOption,
         "updatedAt": FieldValue.serverTimestamp(),
       });
       List<Workout> updatedWorkouts = await fetchCoachWorkouts();
