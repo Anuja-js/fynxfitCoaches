@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fynxfitcoaches/bloc/bmi/bmi_event.dart';
+import 'package:fynxfitcoaches/theme.dart';
 import 'package:fynxfitcoaches/widgets/customs/custom_text.dart';
 import '../../bloc/bmi/bmi_bloc.dart';
 import '../../bloc/bmi/bmi_state.dart';
@@ -22,10 +23,10 @@ class _BmiScreenState extends State<BmiScreen> {
     return BlocBuilder<BmiBloc, BmiState>(
         builder: (context, state) {
           return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: CustomText(text:"BMI Calculator",),
-        backgroundColor: Colors.black,
+        backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
       ),
       body: Padding(
             padding: const EdgeInsets.all(16.0),

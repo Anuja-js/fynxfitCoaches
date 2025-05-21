@@ -4,8 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:fynxfitcoaches/bloc/BMI/bmi_bloc.dart';
 import 'package:fynxfitcoaches/bloc/articles/articles_bloc.dart';
 import 'package:fynxfitcoaches/bloc/birthday/birthday_bloc.dart';
 import 'package:fynxfitcoaches/bloc/bottomnav/nav_cubit.dart';
@@ -19,6 +17,7 @@ import 'package:fynxfitcoaches/bloc/fitnessgoals/fitness_goals_event.dart';
 import 'package:fynxfitcoaches/bloc/gender/gender_selection_bloc.dart';
 import 'package:fynxfitcoaches/bloc/height/height_bloc.dart';
 import 'package:fynxfitcoaches/bloc/infocoach/coach_info_bloc.dart';
+import 'package:fynxfitcoaches/bloc/password_cubit.dart';
 import 'package:fynxfitcoaches/bloc/profileimage/profileimage_bloc.dart';
 import 'package:fynxfitcoaches/bloc/profileonboading/profile_onboading_cubit.dart';
 import 'package:fynxfitcoaches/bloc/weight/weight_bloc.dart';
@@ -26,12 +25,12 @@ import 'package:fynxfitcoaches/bloc/workouts/workout_bloc.dart';
 import 'package:fynxfitcoaches/controlers/singnal_controler.dart';
 import 'package:fynxfitcoaches/resources/resources_bloc.dart';
 import 'package:fynxfitcoaches/resources/resources_event.dart';
-import 'package:fynxfitcoaches/views/bmi/bmi.dart';
-import 'package:fynxfitcoaches/views/message/user_list_chat.dart';
 import 'package:fynxfitcoaches/views/splash/splash.dart';
 import 'bloc/auth/auth_bloc.dart';
+import 'bloc/bmi/bmi_bloc.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -60,6 +59,8 @@ void main() async {
     ),
     BlocProvider(
       create: (context) => HeightBloc(),
+    ), BlocProvider(
+      create: (context) => PasswordVisibilityCubit(),
     ),
     BlocProvider(
       create: (context) => DocumentUploadCubit(),
@@ -79,11 +80,10 @@ void main() async {
           ..add(
             LoadGoals(),
           )),
+   /* BlocProvider(
+      create: (_) => CallBloc(JitsiCallController()),
+    ),*/
     BlocProvider(
-      create: (_) => CallBloc(SignalingController()),
-    ),
-
-  BlocProvider(
       create: (context) =>
           ChatBloc(FirebaseFirestore.instance, FirebaseAuth.instance)
             ..add(LoadChats()),
@@ -96,8 +96,8 @@ void main() async {
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  print('Handling a background message: ${message.messageId}');
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fynxfitcoaches/theme.dart';
+import 'package:fynxfitcoaches/widgets/customs/custom_text.dart';
+
 class ErrorPage extends StatefulWidget {
   const ErrorPage({super.key});
 
@@ -10,30 +13,30 @@ class ErrorPage extends StatefulWidget {
 
 class _ErrorPageState extends State<ErrorPage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _slideAnimation;
+  late AnimationController controller;
+  late Animation<Offset> slideAnimation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
 
-    _slideAnimation = Tween<Offset>(
+    slideAnimation = Tween<Offset>(
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+      CurvedAnimation(parent: controller, curve: Curves.easeOut),
     );
 
-    _controller.forward();
+    controller.forward();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -43,10 +46,11 @@ class _ErrorPageState extends State<ErrorPage>
       backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
       body: Center(
         child: SlideTransition(
-          position: _slideAnimation,
-          child: const Text(
-            "Your account is not verified by the admin.",
-            style: TextStyle(color: Colors.red, fontSize: 18),
+          position: slideAnimation,
+          child: CustomText(
+            text: "Your account is not verified by the admin.",
+            color: Colors.red,
+            fontSize: 16.sp,
             textAlign: TextAlign.center,
           ),
         ),

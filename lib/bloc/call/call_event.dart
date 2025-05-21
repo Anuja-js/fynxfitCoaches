@@ -1,15 +1,10 @@
 abstract class CallEvent {}
 
 class CallInitialize extends CallEvent {
-final String callId;
-CallInitialize(this.callId);
-}
-
-class CallReceive extends CallEvent {
-
   final String callId;
-  CallReceive(this.callId);
-}
+  final String? displayName;
 
+  CallInitialize(this.callId, {this.displayName});
+}
 
 class CallEnd extends CallEvent {}

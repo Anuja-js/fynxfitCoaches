@@ -44,21 +44,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           if (authdata != null) {
             DocumentSnapshot userDoc = await _firestore.collection('coaches').doc(authdata.uid).get();
 
-            // if (userDoc.exists && userDoc['verified'] == "true") {
               await _updateUserLoginTime(authdata);
               emit(AuthSuccess(authdata));
-            // } else {
-            //   emit(AuthFailure("Your account is not verified by the admin."));
-            // }
-
             return null;
           } else {
             // throw e;
             emit(AuthFailure(e.toString()));
             return e.toString();
           }
-      // emit(AuthFailure(e.toString()));
-      // return e.toString();
     }
   }
 

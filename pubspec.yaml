@@ -41,7 +41,7 @@ dependencies:
   country_flags: ^2.0.1
   google_sign_in: ^6.1.5
   firebase_auth:
-  firebase_core:
+  firebase_core: ^2.11.0
   cloud_firestore_database_wrapper:
   pinput: ^5.0.1
   syncfusion_flutter_charts: ^22.2.12
@@ -53,10 +53,14 @@ dependencies:
   video_player: ^2.9.3
   http: ^1.3.0
   cloudinary_public: ^0.23.1
-  flutter_webrtc: ^0.9.19
-  webrtc_interface: 1.0.12
+  #  flutter_webrtc: any
+  #  webrtc_interface: any
   intl: ^0.18.1
+#  jitsi_meet_flutter_sdk: any
+  zego_uikit_prebuilt_call: ^4.16.29
+  zego_uikit_signaling_plugin: ^2.5.2
   firebase_messaging: any
+#  hmssdk_flutter: ^1.10.6
 
 
 dev_dependencies:
@@ -83,7 +87,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-     - assets/images/
+    - assets/images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

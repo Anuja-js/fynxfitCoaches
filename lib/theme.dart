@@ -11,7 +11,7 @@ class AppThemes {
     ),
     textTheme: TextTheme(
       bodyLarge: TextStyle(color: Colors.black),
-      bodyMedium: TextStyle(color: Colors.black),
+      bodyMedium: TextStyle(color: Color(0xff6D6D6D)),
     ),
   );
 

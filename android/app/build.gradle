@@ -22,7 +22,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.fynxfitcoaches"
-        minSdkVersion 23
+        minSdkVersion 26
+        compileSdk 35
         targetSdk flutter.targetSdkVersion
         versionCode flutter.versionCode
         versionName flutter.versionName
@@ -43,4 +44,3 @@ flutter {
 
 // IMPORTANT: Apply the Google Services plugin at the bottom of the file so that it can process the dependencies correctly.
 apply plugin: 'com.google.gms.google-services'
-

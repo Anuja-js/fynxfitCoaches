@@ -28,13 +28,6 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       } catch (e) {
         emit(AuthFailure("Failed to check user status: $e"));
       }
-      // await Future.delayed(const Duration(seconds: 3));
-      // final user = FirebaseAuth.instance.currentUser;
-      // if (user != null) {
-      //   emit(UserVerified());
-      // } else {
-      //   emit(UserNotLoggedIn());
-      // }
     });
   }
 }

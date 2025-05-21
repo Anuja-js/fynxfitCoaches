@@ -33,10 +33,9 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
   void initState() {
     super.initState();
     markMessagesAsRead(widget.chatId);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<ChatBloc>().add(LoadChats());
-      });
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ChatBloc>().add(LoadChats());
+    });
   }
 
   void markMessagesAsRead(String chatId) async {
@@ -93,6 +92,7 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
       );
     });
   }
+
 // Helper functions
   bool isToday(DateTime date) {
     final now = DateTime.now();
@@ -115,10 +115,12 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
       backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
-        title: CustomText(text:widget.username,fontSize: 15.sp,fontWeight: FontWeight.bold,),
+        title: CustomText(
+          text: widget.username, fontSize: 15.sp, fontWeight: FontWeight.bold,),
         actions: [
           IconButton(
-            icon: Icon(Icons.call,color:  AppThemes.darkTheme.appBarTheme.foregroundColor,),
+            icon: Icon(Icons.call,
+              color: AppThemes.darkTheme.appBarTheme.foregroundColor,),
             tooltip: 'Audio Call',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -127,13 +129,14 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
             },
           ),
           IconButton(
-            icon:  Icon(Icons.videocam,color:AppThemes.darkTheme.appBarTheme.foregroundColor,),
+            icon: Icon(Icons.videocam,
+              color: AppThemes.darkTheme.appBarTheme.foregroundColor,),
             tooltip: 'Video Call',
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => CoachCallScreen(coachId: FirebaseAuth.instance.currentUser!.uid)
+                    builder: (_) => CoachCallScreen(userId:  widget.userId)
 
                 ),
               );
@@ -143,18 +146,18 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
             },
           ),
         ],
-        leading: IconButton(onPressed: (){
+        leading: IconButton(onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => MainPage()
+                builder: (_) => MainPage()
             ),
           ).then((_) {
             context.read<ChatBloc>().add(LoadChats());
           });
-
-
-      }, icon: Icon(Icons.arrow_back,color: AppThemes.darkTheme.appBarTheme.foregroundColor,)),
+        },
+            icon: Icon(Icons.arrow_back,
+              color: AppThemes.darkTheme.appBarTheme.foregroundColor,)),
       ),
       body: Column(
         children: [
@@ -183,7 +186,9 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
                     final msg = messages[index];
                     final isMe = msg['senderId'] == currentUserId;
                     final timestamp = msg['timestamp'] as Timestamp?;
-                    final time = timestamp != null ? timestamp.toDate() : DateTime.now();
+                    final time = timestamp != null
+                        ? timestamp.toDate()
+                        : DateTime.now();
                     final formattedTime = DateFormat('hh:mm a').format(time);
                     final formattedDate = DateFormat('yyyy-MM-dd').format(time);
 
@@ -196,7 +201,8 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
                       final nextMsg = messages[index + 1];
                       final nextTimestamp = nextMsg['timestamp'] as Timestamp?;
                       final nextDate = nextTimestamp != null
-                          ? DateFormat('yyyy-MM-dd').format(nextTimestamp.toDate())
+                          ? DateFormat('yyyy-MM-dd').format(
+                          nextTimestamp.toDate())
                           : '';
                       if (nextDate != formattedDate) {
                         showDate = true;
@@ -210,7 +216,8 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Center(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: Colors.grey.shade400,
                                   borderRadius: BorderRadius.circular(10),
@@ -228,14 +235,20 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
                             ),
                           ),
                         Align(
-                          alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                          alignment: isMe ? Alignment.centerRight : Alignment
+                              .centerLeft,
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 10),
                             padding: const EdgeInsets.all(12),
                             constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width * 0.7),
+                                maxWidth: MediaQuery
+                                    .of(context)
+                                    .size
+                                    .width * 0.7),
                             decoration: BoxDecoration(
-                              color: isMe ? Colors.purple : Colors.grey.shade300,
+                              color: isMe ? Colors.purple : Colors.grey
+                                  .shade300,
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Column(
@@ -243,14 +256,17 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
                               children: [
                                 Text(
                                   msg["text"],
-                                  style: TextStyle(color: isMe ? Colors.white : Colors.black),
+                                  style: TextStyle(
+                                      color: isMe ? Colors.white : Colors
+                                          .black),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   formattedTime,
                                   style: TextStyle(
                                     fontSize: 10,
-                                    color: isMe ? Colors.white70 : Colors.black54,
+                                    color: isMe ? Colors.white70 : Colors
+                                        .black54,
                                   ),
                                 ),
                               ],
@@ -261,7 +277,6 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
                     );
                   },
                 );
-
               },
             ),
           ),
@@ -286,7 +301,7 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.send, color: Colors.purple),
-                  onPressed: (){
+                  onPressed: () {
                     sendMessage();
                     // sendPushNotification(
                     //     "New Message", messageController.text.trim());
@@ -299,66 +314,4 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
       ),
     );
   }
-
-  // Future<void> sendPushNotification(String title, String body) async {
-  //   // Replace with your actual JSON file path
-  //   final serviceAccountJson = 'assets/service-account.json';
-  //   final user =
-  //   await FirebaseFirestore.instance.collection("users").doc(widget.userId).get();
-  //   final serviceAccount = ServiceAccountCredentials.fromJson({
-  //     "type": "service_account",
-  //     "project_id": "fynxfit",
-  //     "private_key_id": "f8fc20233e74fc91768fb67ed56f1f395b65d9de",
-  //     "private_key":
-  //     "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDMGLrr1hCqIRCN\n8Dxn743qUrT2rXnNg9RMpCfexHALtCqZb22JKKRJItqYwSrhVskqkiuuWzNX4moN\ngFuiAjCzqObSkY7bqHYRlyMsPuDFpExVJYYXZU5+pHBqv42XjhZolchtCy3Y1Cs+\nDbPlYxeq+fYXB8W3sVKwXhUS145QAPPraIs+pMx2GQTCH4+DhRSlP1jEm9yOWtkI\n32Qh/i/gICbHKZKwwrByYWsIkzd1WdqZ/ezLFFVkPQGvNJjuKR8QhGr00P1pFbAO\nRkCgu3RuZVhLVPZwWIDKbxNA7iE6aR59Wb8OS2SCZR/8FnnvSMhdq36LUdMVeK5u\nvflMTngpAgMBAAECggEAD/ZBLC+eNwgF+OvYdZJ9KV3VjFNN6t5MDMBr49a+IpQx\nHrXhva/hhVzF9ttopJ36dqte4jB8x/tLqwmmYPnF4E8t2jsLDq/SqBaHaC70ulBa\nrfAU2CCSroHizt5zTu6MXxqTxb9xkvso9J3yu1ZwI+2PqwZvFqo2GtgI0uPr2+LL\nb4Weu0c7Nd+SIeMrLKsWN5npsKdUFVA5l6XLEmRefgGrpeTJsXJ09+eBwtriHoYI\nsjnsKrgQY6qQTNt7a6XzSZ0Q5ulqlKzfAu1ySIjXFATI6gR7fVhLNu+lD8zwTcrs\nVnesIytXK+1J4eWsT796NrH4ipua6CUMxIgVeiwelwKBgQDmcNI4hws0siJh1q8p\nwn/Hi8SvlbvJT+PpMzrhlTfM73WqBiPMcMSZ8PK0OczgzicEWg97Yz56rYtauHGJ\ngqpHU6Mna692Y9lL9NmQM/QXKa3zwa3aZgulTdk1WAQTmth84zVQJh9uzdL05zqL\nfJTFhbXQk9F8Q6jIbpXU+QnzywKBgQDiu+OnAbjigUVgZKs0yiw9dPlvZFEkUY29\n+C+sq56o8jTH8exY7j9yae8XyRLbij8805eERzvdRj36ZzoeUodcneum4Uubizgp\nRcduXy/r306iNNL2Shevv0VUFep4+K7ROz5mbIfYEuWJy6KOwTq34/ZqvC7GqXUm\nei7iW7qNWwKBgCTHhQX4p9U1ST+MYFCt9m8G49GSeHJdCedCgfdXNZzD62fDqxsK\nNJbNWi9huk13GcscBLSQ1nwGDuPf5F8qN7tCohu8mDixHxF8du0JHcBEqrrpArKE\n7v7nOe/FqIDoif0E1pGARCwPNchYz4NL0wLjoG016o2Gzv2OiOOBDBGZAoGAVCKC\nnJNgBvUPSHCyszkeZ4PDl5kzHvYAUfEJx9o7WtfdzCAyouFtu8ghh8L+c2b+hlTC\nEbzZMwgAsa2ifGQFhNG5A0jw5Hwpz+7rzUIXJ0DLDhfp/KiL15RzZntncZJeVJfW\nVO2LDxwb/yEIZk6/ukMmSn8gIGn7ZdbLFQYS2KcCgYAhefDHaW52p3xKI0crfFfE\ntbKIPJnfi0uyfc+RduQm02Cuoc72K5ajXee3q6jTtN4nyZqo6KK6FvQBxrbNeKeG\nNhETqYVmowDXypmLIl8UTfNv9lI5aoqWHWN9C/hNo5JPyne0sbbUwFP9JtCmW90q\n7yIYh3FV7ZuiF6RUh/Q0Ow==\n-----END PRIVATE KEY-----\n",
-  //     "client_email": "fcm-sender@fynxfit.iam.gserviceaccount.com",
-  //     "client_id": "110566486742074336971",
-  //     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  //     "token_uri": "https://oauth2.googleapis.com/token",
-  //     "auth_provider_x509_cert_url":
-  //     "https://www.googleapis.com/oauth2/v1/certs",
-  //     "client_x509_cert_url":
-  //     "https://www.googleapis.com/robot/v1/metadata/x509/fcm-sender%40fynxfit.iam.gserviceaccount.com",
-  //     "universe_domain": "googleapis.com"
-  //   });
-  //
-  //   final scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-  //
-  //   final client = await clientViaServiceAccount(serviceAccount, scopes);
-  //
-  //   final projectId = 'fynxfit'; // Replace with your actual project ID
-  //
-  //   final url = Uri.parse(
-  //       'https://fcm.googleapis.com/v1/projects/$projectId/messages:send');
-  //
-  //   final message = {
-  //     "message": {
-  //       "token":user["fcmtocken"],
-  //       "notification": {
-  //         "title": title,
-  //         "body": body,
-  //       },
-  //       "android": {
-  //         "priority": "HIGH",
-  //       },
-  //       "apns": {
-  //         "headers": {"apns-priority": "10"},
-  //         "payload": {
-  //           "aps": {"sound": "default"}
-  //         }
-  //       }
-  //     }
-  //   };
-  //
-  //   final response = await client.post(
-  //     url,
-  //     headers: {'Content-Type': 'application/json'},
-  //     body: jsonEncode(message),
-  //   );
-  //
-  //   print("Status Code: ${response.statusCode}");
-  //   print("Response: ${response.body}");
-  //
-  //   client.close();
-  // }
 }
