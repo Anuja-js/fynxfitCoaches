@@ -25,7 +25,7 @@ class _BmiScreenState extends State<BmiScreen> {
           return Scaffold(
       backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: CustomText(text:"BMI Calculator",),
+        title: const CustomText(text:"BMI Calculator",),
         backgroundColor: AppThemes.darkTheme.scaffoldBackgroundColor,
       ),
       body: Padding(

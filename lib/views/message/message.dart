@@ -12,6 +12,7 @@ import 'package:fynxfitcoaches/views/call/video_call.dart';
 import 'package:fynxfitcoaches/views/main_page/main_screen.dart';
 import 'package:intl/intl.dart';
 import '../../widgets/customs/custom_text.dart';
+import '../call/audio_call.dart';
 
 class CoachChatScreen extends StatefulWidget {
   final String chatId;
@@ -123,6 +124,13 @@ class _CoachChatScreenState extends State<CoachChatScreen> {
               color: AppThemes.darkTheme.appBarTheme.foregroundColor,),
             tooltip: 'Audio Call',
             onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => CoachAudioCallScreen(userId:  widget.userId)
+
+                ),
+              );
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Audio Call Pressed')),
               );
